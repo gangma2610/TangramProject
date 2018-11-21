@@ -16,10 +16,21 @@ class ColorContourRecognition:
         7. 获取第一阶段处理结果（上述操作的总和）
         """
 
-    def __init__(self, id, cap, path):
+    # def __init__(self, id, cap, path):
+    #     self.id = id  # 标志实物图
+    #     # _, self.image = cap.read()  # 从摄像头读取
+    #     self.image = self.readImage(cap, path)
+    #     self.cnts = []
+    #     self.cnt_num = 0
+    #     self.centerP = Point(0, 0)  # 形状的中心点
+
+    def __init__(self, id, img):
         self.id = id  # 标志实物图
-        # _, self.image = cap.read()  # 从摄像头读取
-        self.image = self.readImage(cap, path)
+
+        if self.id == 0:
+            img = self.adjustContrastBrightness(img, 1.25, -10)
+        self.image = img
+
         self.cnts = []
         self.cnt_num = 0
         self.centerP = Point(0, 0)  # 形状的中心点
@@ -118,12 +129,19 @@ class ShapeRecognition(ColorContourRecognition):
         7. 三个阶段完整的识别过程
         """
 
-    def __init__(self, id, cap, path):
+    # def __init__(self, id, cap, path):
+    #     self.shape = ''
+    #     self.vertex = []
+    #     self.hypotenusAngle = 0
+    #     self.centerVector = (0, 0)
+    #     ColorContourRecognition.__init__(self, id, cap, path)
+
+    def __init__(self, id, img):
         self.shape = ''
         self.vertex = []
         self.hypotenusAngle = 0
         self.centerVector = (0, 0)
-        ColorContourRecognition.__init__(self, id, cap, path)
+        ColorContourRecognition.__init__(self, id, img)
 
     def getDeviationAngle(self):
         """ 返回斜边角度 """
@@ -275,7 +293,9 @@ class ShapeRecognition(ColorContourRecognition):
             self.centerVector = (centerImage[0] - cX, centerImage[1] - cY)  # 位移矢量
             self.getDeviationAngle()  # 计算斜边角度
         else:
+            cv2.imwrite('images/template/wrong.jpg', self.image)
             print("最终轮廓数：", self.cnt_num)
+
             exit()
 
         cv2.imshow("FinallyImage", self.image)
@@ -384,13 +404,15 @@ def testCamera():
 
 def recognitionRotate():  # 完整测试
     mouldPath = 'images/mould/1.jpg'
+    mould_image = cv2.imread(mouldPath)
     # capPath = "images/figured/01.jpg"
     for image_index in range(10, 37):
         capPath = "images/figured/"
         # cappath = "images/simpleImage/blue/"
         # mouldpath = "images/mould/"
         capPath += str(image_index) + ".jpg"
-        print(capPath)
+        real_image = cv2.imread(capPath)
+
         # cap = cv2.VideoCapture(0)
         # cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1024)
         # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 768)
@@ -417,53 +439,18 @@ def recognitionRotate():  # 完整测试
             else:
                 colorGoal = 'purple'
                 shapeGoal = 'triangle'
-            mould = ShapeRecognition(1, cap='', path=mouldPath)
+
+            mould = ShapeRecognition(1, mould_image)
             mould.completeRecognition(colorGoal, shapeGoal)
-            cap = ShapeRecognition(0, cap='', path=capPath)
-            cap.completeRecognition(colorGoal, shapeGoal)
+            real = ShapeRecognition(0, real_image)
+            real.completeRecognition(colorGoal, shapeGoal)
+            print('mould vector:' , mould.centerVector)
+            print('real vector:' , real.centerVector)
             rotate = Rotate()
-            angle = rotate.getRotateAngle(cap, mould, shapeGoal)
+            angle = rotate.getRotateAngle(real, mould, shapeGoal)
             print(colorGoal+" angle", angle)
-            cv2.imwrite("images/results/" + str(image_index) + str(colorGoal)+'.jpg', cap.getImage())
+            cv2.imwrite("images/results/" + str(image_index) + str(colorGoal)+'.jpg', real.getImage())
 
-def classTest():  # 识别部分，未测试旋转
-    # cap = cv2.VideoCapture(0)
-    # cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1024)
-    # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 768)
-    # print('启动摄像头...')
-    # path = "images/figured/"
-    # path = "images/simpleImage/blue/"
-    # image_index = input("Please input the index of image:")
-
-    for image_index in range(1, 2):
-        path = "images/figured/0"
-        # path = "images/simpleImage/blue/"
-        # path = "images/mould/"
-        path += str(image_index) + ".jpg"
-        print(path)
-        shapeGoal = 'triangle'
-        for i in range(0, 7):
-
-            if i == 0:
-                colorGoal = 'pink'
-            elif i == 1:
-                colorGoal = 'red'
-            elif i == 2:
-                colorGoal = 'orange'
-            elif i == 3:
-                colorGoal = 'yellow'
-                shapeGoal = 'parallelogram'
-            elif i == 4:
-                colorGoal = 'green'
-            elif i == 5:
-                colorGoal = 'blue'
-                shapeGoal = 'square'
-            else:
-                colorGoal = 'purple'
-            t1 = ShapeRecognition(1, cap, path)
-
-            t1.completeRecognition('yellow', 'parallelogram')
-            #cv2.imwrite("images/results/"+str(image_index)+'yellow.jpg', t1.getImage())
 
 if __name__ == '__main__':
 

@@ -5,13 +5,6 @@
 # @Site    : 
 # @File    : decision.py
 # @Software: PyCharm
-from robot_controller import RobotController
-# from Color_pos_update import *
-
-# import Mould
-# import rotate_test
-import assistant_functions
-
 import numpy as np
 import cv2
 import math
@@ -22,6 +15,10 @@ import time
 import os
 import sys
 import math
+
+from robot_controller import RobotController
+from RecognitionRotate import ColorContourRecognition, ShapeRecognition, Rotate
+import assistant_functions
 ############################################################################################
 class Decision:
 
@@ -96,21 +93,12 @@ class Decision:
         :return: tuple
                 (y,x)移动方向的矢量坐标
         """
-        # 调整图像亮度、对比度
-        # image = contrast_brightness_image(image, 1.3, -10)
-        # h, w = image.shape[:2]
-        # 调整图像亮度、对比度
-        # 高斯模糊去噪
-        # blured = cv2.GaussianBlur(image, (5, 5), 0)
-        # cv2.imshow("blured", blured)
-        # cv2.waitKey(0)
-        # 进行泛洪填充，处理背景
-        # mask = np.zeros((h + 2, w + 2), np.uint8)  # 掩码长和宽都比输入图像多两个像素点，满水填充不会超出掩码的非零边缘
-        # cv2.floodFill(blured, mask, (w - 1, h - 1), (0, 0, 0), (50, 35, 50), (185, 190, 190), cv2.FLOODFILL_FIXED_RANGE)
-        image = contrast_brightness_image(image, 1.3, -10)
-        ld = Analysis()
-        vec = ld.analy(color, shape, image)
-        return vec
+
+        # ld = Analysis()
+        # vec = ld.analy(color, shape, image)
+        real = ShapeRecognition(0, image)
+        real.completeRecognition(color, shape)
+        return real.centerVector
 
 
 
@@ -253,8 +241,28 @@ class Decision:
         return carpos
 
 
+    def get_angle(self, real_image, e_image, color, shape):
+        """
 
-    def grab_tangram(self, data_mould, m, x_distance=44, y_distance = 4.75, height=167):
+        :param real_image:
+        :param e_image:
+        :param color:
+        :param shape:
+        :return:
+        """
+        mould = ShapeRecognition(1, e_image)
+        mould.completeRecognition(color, shape)
+        real = ShapeRecognition(0, real_image)
+        real.completeRecognition(color, shape)
+        rotate = Rotate()
+        ang, flag = rotate.getRotateAngle(real, mould, shape)
+        if flag == True:
+            ang = -ang
+        return ang
+
+
+
+    def grab_tangram(self, e_image, color, shape, x_distance=44, y_distance = 4.75, height=167):
         """
         目标定位到视野中心后，将手爪移至目标上方，计算旋转角度，然后抓取目标，进行旋转。
 
@@ -274,9 +282,10 @@ class Decision:
         :return:    None
         """
         # 计算旋转角度
-        ret, img = self._cap.read()
+        ret, real_img = self._cap.read()
         # cv2.imwrite('angle.jpg', img)
-        ang = rotate_test.get_rotate_angle(data_mould, img, m)
+        # ang = rotate_test.get_rotate_angle(data_mould, img, m)
+        ang = self.get_angle(real_img, e_image, color, shape)
 
         # 计算矫正后的手臂坐标，并将爪子定位到目标上方。
         # robot.move_car_by_offset(offset_x=distance)
@@ -300,7 +309,7 @@ class Decision:
         return ang
 
 
-    def processing(self, data_mould, m):
+    def processing(self, e_image, color, shape='triangle'):
         """
         拼第m块拼图。
 
@@ -315,17 +324,21 @@ class Decision:
         ----------
         :return: None
         """
-        print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
+        print('===================================================')
 
         # step1: 获取电子图相应目标信息，并计算拼图区域对应坐标
-        shape, color, (y, x) = data_mould.no_shape[str(m)][:3]
-        print(shape, color, (x, y))
+        mould = ShapeRecognition(1, e_image)
+        mould.completeRecognition(color, shape)
+        (y, x) = mould.centerVector
+        # shape, color, (y, x) = data_mould.no_shape[str(m)][:3]
+        # print(shape, color, (x, y))
+
         # 计算拼图区域对应坐标
         target_pos = self.cal_target_car_pos(x=x, y=y)
         # step2: 定位指定颜色和形状的木块
         self.locating(color, shape)
         # step3: 计算旋转角度，并抓取目标
-        ang = self.grab_tangram(data_mould, m)
+        ang = self.grab_tangram(e_image, color, shape)
         # step4: 移至拼图对应区域,旋转相应角度，并释放目标
         target_pos[2] = 200
         print('移至拼图对应区域： ({0}, {1})'.format(target_pos[0], target_pos[1]))
@@ -352,7 +365,7 @@ class Decision:
 
 
 
-    def do_puzzles(self, data_mould):
+    def do_puzzles(self, e_image):
         """
         拼拼图。
 
@@ -367,8 +380,35 @@ class Decision:
         """
         self._robot_instance.set_speed(4)
 
-        for m in range(0, 7):
-            self.processing(data_mould, m)
+        # for m in range(0, 7):
+        #     self.processing(data_mould, m)
+        for i in range(0, 1):
+            if i == 0:
+                color = 'pink'
+                shape = 'triangle'
+            elif i == 1:
+                color = 'red'
+                shape = 'triangle'
+            elif i == 2:
+                color = 'orange'
+                shape = 'triangle'
+            elif i == 3:
+                color = 'yellow'
+                shape = 'parallelogram'
+            elif i == 4:
+                color = 'green'
+                shape = 'triangle'
+            elif i == 5:
+                color = 'blue'
+                shape = 'square'
+            else:
+                color = 'purple'
+                shape = 'triangle'
+
+            self.processing(e_image, color, shape)
+
+
+
 
 
 
@@ -381,22 +421,14 @@ def main():
     :return: None
     ----------
     """
-    assistant_functions.delete_image('image/catching/')
+    assistant_functions.delete_image('images/catching/')
     start = time.time()
     decesion = Decision()
-    #识别电子图
-    # data_mould = Mould.Mould_work('image/mould/1.jpg')
-    # data_mould = Mould.Mould_work('image/mould/people01.jpg')
-    data_mould = Mould.Mould_work('image/mould/5.jpg')
-    # decesion.do_puzzles(data_mould)
+    #
+    e_image = cv2.imread('images/mould/5.jpg')
 
-    # decesion.processing(data_mould, 0)
-    decesion.processing(data_mould, 1)
-    # decesion.processing(data_mould, 2)
-    # decesion.processing(data_mould, 3)
-    # decesion.processing(data_mould, 4)
-    # decesion.processing(data_mould, 5)
-    # decesion.processing(data_mould, 6)
+    decesion.do_puzzles(e_image)
+
     print('end!!!')
     end = time.time()
     print('time: {}'.format(int(end - start)))
