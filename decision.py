@@ -129,7 +129,7 @@ class Decision:
             # catch an image
             ret, img = self._cap.read()
 
-            cv2.imwrite('image/catching/{0}.jpg'.format(self._num_pic), img)
+            cv2.imwrite('images/catching/{0}.jpg'.format(self._num_pic), img)
             self._num_pic += 1
 
             y, x = self.get_image_vector(img, color, shape)
