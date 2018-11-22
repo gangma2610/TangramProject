@@ -28,7 +28,7 @@ class ColorContourRecognition:
         self.id = id  # 标志实物图
 
         if self.id == 0:
-            img = self.adjustContrastBrightness(img, 1.25, -10)
+            img = self.adjustContrastBrightness(img, 1.1, -10)
         self.image = img
 
         self.cnts = []
@@ -67,7 +67,7 @@ class ColorContourRecognition:
             image = cv2.imread(path)
 
         if self.id == 0:
-            image = self.adjustContrastBrightness(image, 1.25, -10)
+            image = self.adjustContrastBrightness(image, 1.15, -10)
         cv2.imwrite("images/template/01.jpg", image)
         return image
 
@@ -417,11 +417,11 @@ def recognitionRotate():  # 完整测试
         # cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1024)
         # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 768)
         # print('启动摄像头...')
-        for i in range(0, 7):
+        for i in range(0, 6):
             if i == 0:
                 colorGoal = 'pink'
                 shapeGoal = 'triangle'
-            elif i == 1:
+            elif i == 6:
                 colorGoal = 'red'
                 shapeGoal = 'triangle'
             elif i == 2:

@@ -237,7 +237,7 @@ class Decision:
         :return: tuple
                 对应拼图区域的笛卡尔坐标((x,y,z,A,B,C), 精度：两位小数)
         '''
-        carpos = [round(x0 - x / 3), round(y0 - y / 3), height, 180, 0, 0]
+        carpos = [round(x0 - x / 3, 2), round(y0 - y / 3, 2), height, 180, 0, 0]
         return carpos
 
 
@@ -329,7 +329,7 @@ class Decision:
         # step1: 获取电子图相应目标信息，并计算拼图区域对应坐标
         mould = ShapeRecognition(1, e_image)
         mould.completeRecognition(color, shape)
-        (y, x) = mould.centerVector
+        (y, x) = (mould.centerP.x, mould.centerP.y)
         # shape, color, (y, x) = data_mould.no_shape[str(m)][:3]
         # print(shape, color, (x, y))
 
@@ -382,7 +382,7 @@ class Decision:
 
         # for m in range(0, 7):
         #     self.processing(data_mould, m)
-        for i in range(0, 1):
+        for i in range(4, 7):
             if i == 0:
                 color = 'pink'
                 shape = 'triangle'
