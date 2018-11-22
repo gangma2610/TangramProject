@@ -394,13 +394,60 @@ class Rotate:
 
 
 
-def testCamera():
-    """ 摄像头测试 """
+#============================================================
+#                   测试部分
+#============================================================
+def test_by_camera():
+    """
+    通过摄像头测试。
+    """
     cap = cv2.VideoCapture(0)
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1024)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 768)
     print('启动摄像头...')
-    ret, image = cap.read()
+    ret, real_image = cap.read()
+    mould_image = cv2.imread('images/mould/5.jpg')
+
+    for i in range(0, 7):
+        if i == 0:
+            colorGoal = 'pink'
+            shapeGoal = 'triangle'
+        elif i == 6:
+            colorGoal = 'red'
+            shapeGoal = 'triangle'
+        elif i == 2:
+            colorGoal = 'orange'
+            shapeGoal = 'triangle'
+        elif i == 3:
+            colorGoal = 'yellow'
+            shapeGoal = 'parallelogram'
+        elif i == 4:
+            colorGoal = 'green'
+            shapeGoal = 'triangle'
+        elif i == 5:
+            colorGoal = 'blue'
+            shapeGoal = 'square'
+        else:
+            colorGoal = 'purple'
+            shapeGoal = 'triangle'
+        # 电子图识别
+        mould = ShapeRecognition(1, mould_image)
+        mould.completeRecognition(colorGoal, shapeGoal)
+        # 实物图识别
+        real = ShapeRecognition(0, real_image)
+        real.completeRecognition(colorGoal, shapeGoal)
+
+        print('mould vector:', mould.centerVector)
+        print('real vector:', real.centerVector)
+
+        # 旋转角度计算
+        rotate = Rotate()
+        angle = rotate.getRotateAngle(real, mould, shapeGoal)
+        print(colorGoal + " angle", angle)
+        cv2.imwrite("images/results/" + str(image_index) + str(colorGoal) + '.jpg', real.getImage())
+
+
+
 
 def recognitionRotate():  # 完整测试
     mouldPath = 'images/mould/1.jpg'
@@ -408,20 +455,14 @@ def recognitionRotate():  # 完整测试
     # capPath = "images/figured/01.jpg"
     for image_index in range(10, 37):
         capPath = "images/figured/"
-        # cappath = "images/simpleImage/blue/"
-        # mouldpath = "images/mould/"
         capPath += str(image_index) + ".jpg"
         real_image = cv2.imread(capPath)
 
-        # cap = cv2.VideoCapture(0)
-        # cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1024)
-        # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 768)
-        # print('启动摄像头...')
-        for i in range(0, 6):
+        for i in range(0, 7):
             if i == 0:
                 colorGoal = 'pink'
                 shapeGoal = 'triangle'
-            elif i == 6:
+            elif i == 1:
                 colorGoal = 'red'
                 shapeGoal = 'triangle'
             elif i == 2:
@@ -454,5 +495,5 @@ def recognitionRotate():  # 完整测试
 
 if __name__ == '__main__':
 
-    # classTest()
+    # test_by_camera()
     recognitionRotate()
