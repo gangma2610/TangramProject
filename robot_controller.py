@@ -122,7 +122,7 @@ class RobotController():
 
 
 
-    def move_axis(self, axisPos, prea):
+    def move_axis(self, axisPos):
         """
         将笛卡尔坐标系转换成关节坐标系后，获取发送字符串。
 
@@ -130,7 +130,6 @@ class RobotController():
         ----------
         :param carPos: list
                 笛卡尔坐标([x,y,z,A,B,C], 精度：两位小数)
-        :param prea:
 
         返回值：
         ----------

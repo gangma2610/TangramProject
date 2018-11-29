@@ -262,7 +262,7 @@ class Decision:
 
 
 
-    def grab_tangram(self, e_image, color, shape, x_distance=44, y_distance = 4.75, height=167):
+    def grab_tangram(self, e_image, color, shape, x_distance=44, y_distance = 6.5, height=164): #height = 167
         """
         目标定位到视野中心后，将手爪移至目标上方，计算旋转角度，然后抓取目标，进行旋转。
 
@@ -297,7 +297,7 @@ class Decision:
             sys.exit()
 
         # 降低高度，以便抓取目
-        self._robot_instance.move_car_by_offset(offset_z=-193)  # z = 167
+        self._robot_instance.move_car_by_offset(offset_z=-196)  # z = 164
         # self.delay(5)
         # 抓取目标
         self._robot_instance.control_paw(5)
@@ -342,7 +342,7 @@ class Decision:
         # step4: 移至拼图对应区域,旋转相应角度，并释放目标
         target_pos[2] = 200
         print('移至拼图对应区域： ({0}, {1})'.format(target_pos[0], target_pos[1]))
-        self._robot_instance.move_car(target_pos)  # z = 180
+        self._robot_instance.move_car(target_pos)  # z = 200
        # self.delay(7)
 
         # 旋转角度
@@ -351,13 +351,13 @@ class Decision:
         # self.delay(11)
         print('z轴降低 %d mm，高度：%d ' % (31, 170))
         self._robot_instance.set_speed(1)
-        self._robot_instance.move_car_by_offset(offset_z=-29)  # z = 172
+        self._robot_instance.move_car_by_offset(offset_z=-35)  # z = 172 #z=165
         self._robot_instance.set_speed(4)
         # self.delay()
 
         # 释放目标
         self._robot_instance.control_paw(4)
-        self.delay(3)
+        self.delay(5)
         # self._robot_instance.control_paw(4)
         # self.delay(0.5)
         self._robot_instance.move_car(self._init_carpos)  # 机械臂移动到初始位置
@@ -382,11 +382,11 @@ class Decision:
 
         # for m in range(0, 7):
         #     self.processing(data_mould, m)
-        for i in range(4, 7):
+        for i in range(0, 7):
             if i == 0:
                 color = 'pink'
                 shape = 'triangle'
-            elif i == 1:
+            elif i == 6:
                 color = 'red'
                 shape = 'triangle'
             elif i == 2:
