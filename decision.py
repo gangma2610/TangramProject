@@ -20,9 +20,11 @@ from robot_controller import RobotController
 from RecognitionRotate import ColorContourRecognition, ShapeRecognition, Rotate
 import e_image_module
 import assistant_functions
+
+from items import STACK, SET
 ############################################################################################
 class Decision:
-    def __init__(self, camera_flag=0, frame_width=1024, frame_height=768):
+    def __init__(self, e_image, camera_flag=0, frame_width=1024, frame_height=768):
         """
         参数：
         ----------
@@ -33,6 +35,8 @@ class Decision:
         :param frame_height: int
                 摄像头像素高度
         """
+        self._e_image = e_image
+
         self._num_pic = 0
         self._init_carpos = [400, 100, 510, 180, 0, 0] #初始笛卡尔坐标
 
@@ -191,10 +195,12 @@ class Decision:
 
         # 第一次逼近目标
         print('first time approach...')
+
         print('offset: %d, error: %d' % (10, 80))
         self.gradually_approach(color, shape, 10, 80)
         print('offset: %d, error: %d' % (5, 30))
         self.gradually_approach(color, shape, 5, 30)
+
         print('offset: %d, error: %d' % (2, 5))
         self.gradually_approach(color, shape, 2, 5)
 
@@ -202,6 +208,12 @@ class Decision:
         # self.delay(5)
         # 第二次逼近目标
         print('second time approaching...')
+
+        print('offset: %d, error: %d' % (10, 80))
+        self.gradually_approach(color, shape, 10, 80)
+        print('offset: %d, error: %d' % (5, 30))
+        self.gradually_approach(color, shape, 5, 30)
+
         print('offset: %d, error: %d' % (1, 4))
         self.gradually_approach(color, shape, 1, 4)
 
@@ -209,6 +221,12 @@ class Decision:
         # self.delay(5)
         # 第三次逼近目标
         print('third time approaching...')
+
+        print('offset: %d, error: %d' % (10, 80))
+        self.gradually_approach(color, shape, 10, 80)
+        print('offset: %d, error: %d' % (5, 30))
+        self.gradually_approach(color, shape, 5, 30)
+
         print('offset: %d, error: %d' % (1, 4))
         self.gradually_approach(color, shape, 1, 4)
         # 定位逼近完成，接下来将手爪移至木块上方，计算旋转角度，并抓取目标
@@ -241,16 +259,16 @@ class Decision:
         return carpos
 
 
-    def get_angle(self, real_image, e_image, color, shape):
+    def get_angle(self, real_image, color, shape):
         """
+        计算旋转角度。
+        :param real_image:  实物图
+        :param color:       颜色
+        :param shape:       形状
 
-        :param real_image:
-        :param e_image:
-        :param color:
-        :param shape:
-        :return:
+        :return:            旋转角度
         """
-        mould = ShapeRecognition(1, e_image)
+        mould = ShapeRecognition(1, self._e_image)
         mould.completeRecognition(color, shape)
         real = ShapeRecognition(0, real_image)
         real.completeRecognition(color, shape)
@@ -262,7 +280,7 @@ class Decision:
 
 
 
-    def grab_tangram(self, e_image, color, shape, x_distance=44, y_distance = 6.5, height=164): #height = 167
+    def grab_tangram(self, color, shape, x_distance=44, y_distance = 6.5, height=164): #height = 167
         """
         目标定位到视野中心后，将手爪移至目标上方，计算旋转角度，然后抓取目标，进行旋转。
 
@@ -285,7 +303,7 @@ class Decision:
         ret, real_img = self._cap.read()
         # cv2.imwrite('angle.jpg', img)
         # ang = rotate_test.get_rotate_angle(data_mould, img, m)
-        ang = self.get_angle(real_img, e_image, color, shape)
+        ang = self.get_angle(real_img, color, shape)
 
         # 计算矫正后的手臂坐标，并将爪子定位到目标上方。
         # robot.move_car_by_offset(offset_x=distance)
@@ -309,36 +327,37 @@ class Decision:
         return ang
 
 
-    def processing(self, e_image, color, shape='triangle'):
+    def processing(self, color, shape='triangle', x, y):
         """
-        拼第m块拼图。
+        拼指定颜色和形状的拼图。
 
         参数：
         ----------
-        :param data_mould: tangram_data
-                七巧板数据信息对象
-        :param m: int
-                第m个木块
+        :param color:   颜色
+        :param shape:   形状
+        :param x:       七巧板质心x坐标（机械臂世界坐标系下）
+        :param y:       七巧板质心y坐标（机械臂世界坐标系下）
 
         返回值：
         ----------
-        :return: None
+        :return:    None
         """
         print('===================================================')
 
         # step1: 获取电子图相应目标信息，并计算拼图区域对应坐标
-        mould = ShapeRecognition(1, e_image)
-        mould.completeRecognition(color, shape)
-        (y, x) = (mould.centerP.x, mould.centerP.y)
+        # mould = ShapeRecognition(1, self._e_image)
+        # mould.completeRecognition(color, shape)
+        # (y, x) = (mould.centerP.x, mould.centerP.y)
         # shape, color, (y, x) = data_mould.no_shape[str(m)][:3]
         # print(shape, color, (x, y))
+        print('E-Image：',shape, color, (x, y))
 
         # 计算拼图区域对应坐标
         target_pos = self.cal_target_car_pos(x=x, y=y)
         # step2: 定位指定颜色和形状的木块
         self.locating(color, shape)
         # step3: 计算旋转角度，并抓取目标
-        ang = self.grab_tangram(e_image, color, shape)
+        ang = self.grab_tangram(color, shape)
         # step4: 移至拼图对应区域,旋转相应角度，并释放目标
         target_pos[2] = 200
         print('移至拼图对应区域： ({0}, {1})'.format(target_pos[0], target_pos[1]))
@@ -363,16 +382,10 @@ class Decision:
         self._robot_instance.move_car(self._init_carpos)  # 机械臂移动到初始位置
 
 
-
-
-    def do_puzzles(self, e_image):
+    def do_puzzles(self):
         """
         拼拼图。
 
-        参数：
-        ----------
-        :param data_mould: tangram_data
-                七巧板数据信息对象
 
         返回值：
         ----------
@@ -380,32 +393,11 @@ class Decision:
         """
         self._robot_instance.set_speed(4)
 
-        # for m in range(0, 7):
-        #     self.processing(data_mould, m)
-        for i in range(0, 7):
-            if i == 0:
-                color = 'pink'
-                shape = 'triangle'
-            elif i == 6:
-                color = 'red'
-                shape = 'triangle'
-            elif i == 2:
-                color = 'orange'
-                shape = 'triangle'
-            elif i == 3:
-                color = 'yellow'
-                shape = 'parallelogram'
-            elif i == 4:
-                color = 'green'
-                shape = 'triangle'
-            elif i == 5:
-                color = 'blue'
-                shape = 'square'
-            else:
-                color = 'purple'
-                shape = 'triangle'
-
-            self.processing(e_image, color, shape)
+        while STACK.is_empty() == False:
+            top = STACK.pop() #出栈，拼接栈顶七巧板
+            SET.add(top) # 加入已拼接队列
+            # self.processing(e_image, color, shape)
+            self.processing(top.color, top.shape, top.pos_x, top.pos_y)
 
 
 def main():
@@ -419,11 +411,12 @@ def main():
     """
     assistant_functions.delete_image('images/catching/')
     start = time.time()
-    decesion = Decision()
-    #
     e_image = cv2.imread('images/mould/5.jpg')
+    decesion = Decision(e_image) # 传入电子图
+    #
+
     e_image_module.set_stack(e_image)
-    decesion.do_puzzles(e_image)
+    decesion.do_puzzles()
 
     print('end!!!')
     end = time.time()
