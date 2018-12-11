@@ -18,10 +18,10 @@ import math
 
 from robot_controller import RobotController
 from RecognitionRotate import ColorContourRecognition, ShapeRecognition, Rotate
+import e_image_module
 import assistant_functions
 ############################################################################################
 class Decision:
-
     def __init__(self, camera_flag=0, frame_width=1024, frame_height=768):
         """
         参数：
@@ -408,10 +408,6 @@ class Decision:
             self.processing(e_image, color, shape)
 
 
-
-
-
-
 def main():
     """
     测试机器人逐步逼近目标。
@@ -426,7 +422,7 @@ def main():
     decesion = Decision()
     #
     e_image = cv2.imread('images/mould/5.jpg')
-
+    e_image_module.set_stack(e_image)
     decesion.do_puzzles(e_image)
 
     print('end!!!')
