@@ -5,7 +5,10 @@
 # @Site    : 
 # @File    : e_image_module.py
 # @Software: PyCharm
-
+'''
+识别电子图中的七个七巧板，并按七巧板坐标进行排序，来实现按序拼图的功能。
+将排好序的七个七巧板放入栈STACK中。
+'''
 import cv2
 from items import STACK
 from items import Tangram
@@ -17,7 +20,8 @@ def clear_stack():
 
 def get_list(e_image):
     info = []
-    for i in range(0, 7):
+    # for i in range(0, 7):
+    for i in [0, 1,2,3,4,5,6]:
         if i == 0:
             color = 'pink'
             shape = 'triangle'
@@ -62,7 +66,7 @@ def set_stack(e_image):
 
 
 if __name__ == '__main__':
-    e_image = cv2.imread('images/mould/5.jpg')
+    e_image = cv2.imread('images/mould/cat01.jpg')
     # cv2.imshow('image', e_image)
     # cv2.waitKey(0)
     # tang = get_list(e_image)

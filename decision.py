@@ -22,6 +22,8 @@ import e_image_module
 import assistant_functions
 
 from items import STACK, SET
+
+import fault_tolerant_detection
 ############################################################################################
 class Decision:
     def __init__(self, e_image, camera_flag=0, frame_width=1024, frame_height=768):
@@ -39,6 +41,7 @@ class Decision:
 
         self._num_pic = 0
         self._init_carpos = [400, 100, 510, 180, 0, 0] #初始笛卡尔坐标
+        self._detect_carpos = [400, -155, 400, 180, 0, 0]
 
         self._robot_instance = RobotController()
         # self._robot_instance.send_OK()
@@ -327,7 +330,7 @@ class Decision:
         return ang
 
 
-    def processing(self, color, shape='triangle', x, y):
+    def processing(self, color, shape, x, y):
         """
         拼指定颜色和形状的拼图。
 
@@ -377,6 +380,15 @@ class Decision:
         # 释放目标
         self._robot_instance.control_paw(4)
         self.delay(5)
+
+        # 移到检测位置
+        self._robot_instance.move_car(self._detect_carpos)
+        # 容错检测
+        time.sleep(2)
+        ret, real_img = self._cap.read()
+        cv2.imwrite('images/catching/{0}.jpg'.format(self._num_pic), real_img)
+        self._num_pic += 1
+        fault_tolerant_detection.puzzled_detection(real_img)
         # self._robot_instance.control_paw(4)
         # self.delay(0.5)
         self._robot_instance.move_car(self._init_carpos)  # 机械臂移动到初始位置
@@ -409,9 +421,10 @@ def main():
     :return: None
     ----------
     """
-    assistant_functions.delete_image('images/catching/')
+    # assistant_functions.delete_image('images/catching/')
+    assistant_functions.save_collected_images('images/catching/')
     start = time.time()
-    e_image = cv2.imread('images/mould/5.jpg')
+    e_image = cv2.imread('images/mould/cat01.jpg')
     decesion = Decision(e_image) # 传入电子图
     #
 

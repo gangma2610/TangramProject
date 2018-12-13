@@ -9,13 +9,22 @@
 from decision import *
 
 def main():
-    assistant_functions.delete_image('images/catching/')
-    start = time.time()
-    decesion = Decision()
-    #
-    e_image = cv2.imread('images/mould/5.jpg')
+    """
+    测试机器人逐步逼近目标。
 
-    decesion.do_puzzles(e_image)
+    返回值：
+    ----------
+    :return: None
+    """
+    # assistant_functions.delete_image('images/catching/')
+    assistant_functions.save_collected_images('images/catching/')
+    start = time.time()
+    e_image = cv2.imread('images/mould/cat01.jpg')
+    decesion = Decision(e_image)  # 传入电子图
+    #
+
+    e_image_module.set_stack(e_image)
+    decesion.do_puzzles()
 
     print('end!!!')
     end = time.time()

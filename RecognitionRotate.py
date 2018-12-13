@@ -86,8 +86,8 @@ class ColorContourRecognition:
                 break
         thresh = self.postprocessMorphology(thresh)
 
-        cv2.imshow(d, thresh)
-        cv2.waitKey(0)
+        # cv2.imshow(d, thresh)
+        # cv2.waitKey(0)
         return self.image, thresh
 
     def getContours(self, color):
@@ -237,10 +237,10 @@ class ShapeRecognition(ColorContourRecognition):
             if shapeTemp == shapeGoal:
                 tempCnt.append(c)
                 tempVertexsfiltered.append(tempVertexs)
-                cv2.drawContours(self.image, [c], -1, (255, 0, 0), 1)
-                for i in range(0, len(tempVertexs)):
-                    cv2.putText(self.image, str(i), (tempVertexs[i].x, tempVertexs[i].y),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 255), 2)
+                cv2.drawContours(self.image, [c], -1, (0, 0, 0), 1)
+                # for i in range(0, len(tempVertexs)):
+                #     cv2.putText(self.image, str(i), (tempVertexs[i].x, tempVertexs[i].y),
+                #                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 255), 2)
 
         self.cnts = []
         self.cnts = tempCnt
@@ -257,7 +257,7 @@ class ShapeRecognition(ColorContourRecognition):
             pass
         elif self.cnt_num == 0:
             print("没有检测到轮廓！")
-            exit()
+            # exit()
         else:  # 针对粉色和紫色、红色和橙色
             print("before self.cntnum",self.cnt_num)
             goalArea = cv2.contourArea(self.cnts[0])
@@ -299,7 +299,7 @@ class ShapeRecognition(ColorContourRecognition):
             cv2.imwrite('images/template/wrong.jpg', self.image)
             print("最终轮廓数：", self.cnt_num)
 
-            exit()
+            # exit()
 
         cv2.imshow("FinallyImage", self.image)
         cv2.waitKey(0)
@@ -403,13 +403,49 @@ def testCamera():
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1024)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 768)
     print('启动摄像头...')
-    return cap
-    ret, image = cap.read()
+    # return cap
+    ret, real_image = cap.read()
+
+    for i in [1]:
+        if i == 0:
+            colorGoal = 'pink'
+            shapeGoal = 'triangle'
+        elif i == 1:
+            colorGoal = 'red'
+            shapeGoal = 'triangle'
+        elif i == 2:
+            colorGoal = 'orange'
+            shapeGoal = 'triangle'
+        elif i == 3:
+            colorGoal = 'yellow'
+            shapeGoal = 'parallelogram'
+        elif i == 4:
+            colorGoal = 'green'
+            shapeGoal = 'triangle'
+        elif i == 5:
+            colorGoal = 'blue'
+            shapeGoal = 'square'
+        elif i == 6:
+            colorGoal = 'purple'
+            shapeGoal = 'triangle'
+        print(colorGoal)
+        # mould = ShapeRecognition(1, mould_image)
+        # mould.completeRecognition(colorGoal, shapeGoal)
+        real = ShapeRecognition(0, real_image)
+        real.completeRecognition(colorGoal, shapeGoal)
+        # print('mould vector:', mould.centerVector)
+        print('real vector:', real.centerVector)
+        # rotate = Rotate()
+        # angle = rotate.getRotateAngle(real, mould, shapeGoal)
+        # print(colorGoal + " angle", angle)
+        # cv2.imwrite("images/results/" + str(image_index) + str(colorGoal) + '.jpg', real.getImage())
+    # return image
 
 def recognitionRotate():  # 完整测试
-    mouldPath = 'images/mould/1.jpg'
-    mould_image = cv2.imread(mouldPath)
+    # mouldPath = 'images/mould/1.jpg'
+    # mould_image = cv2.imread(mouldPath)
     # capPath = "images/figured/01.jpg"
+    mould_image = testCamera()
     for image_index in range(17, 18 ):
         cap = testCamera()
         ret, real_image = cap.read()
@@ -423,7 +459,8 @@ def recognitionRotate():  # 完整测试
         # cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1024)
         # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 768)
         # print('启动摄像头...')
-        for i in range(6, 7):
+        # for i in range(6, 7):
+        for i in [1,2, 5, 6]:
             if i == 0:
                 colorGoal = 'pink'
                 shapeGoal = 'triangle'
@@ -461,4 +498,5 @@ def recognitionRotate():  # 完整测试
 if __name__ == '__main__':
 
     # classTest()
-    recognitionRotate()
+    # recognitionRotate()
+    testCamera()
