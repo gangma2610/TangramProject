@@ -105,6 +105,10 @@ class Decision:
         # vec = ld.analy(color, shape, image)
         real = ShapeRecognition(0, image)
         real.completeRecognition(color, shape)
+
+        # if real.cnt_num != 1:
+
+
         return real.centerVector
 
 
@@ -330,7 +334,7 @@ class Decision:
         return ang
 
 
-    def processing(self, color, shape, x, y):
+    def processing(self, item):
         """
         拼指定颜色和形状的拼图。
 
@@ -346,6 +350,10 @@ class Decision:
         :return:    None
         """
         print('===================================================')
+        shape = item.shape
+        color = item.color
+        x = item.pos_x
+        y = item.pos_y
 
         # step1: 获取电子图相应目标信息，并计算拼图区域对应坐标
         # mould = ShapeRecognition(1, self._e_image)
@@ -365,7 +373,7 @@ class Decision:
         target_pos[2] = 200
         print('移至拼图对应区域： ({0}, {1})'.format(target_pos[0], target_pos[1]))
         self._robot_instance.move_car(target_pos)  # z = 200
-       # self.delay(7)
+        # self.delay(7)
 
         # 旋转角度
         print('旋转 %.2f度...' % ang)
@@ -409,7 +417,7 @@ class Decision:
             top = STACK.pop() #出栈，拼接栈顶七巧板
             SET.add(top) # 加入已拼接队列
             # self.processing(e_image, color, shape)
-            self.processing(top.color, top.shape, top.pos_x, top.pos_y)
+            self.processing(top)
 
 
 def main():
