@@ -8,15 +8,17 @@
 
 STATE = 0
 
-NO_SHAPE_ERROR = 1      # 没有检测到形状
+OK = 0
 
-MULTI_SHAPE_ERROR = 2   # 检测到多个形状
+ERROR_NO_SHAPE = 1      # 没有检测到形状
 
-WAIT_TIMES_ERROR = 3    # 容错次数状态
+ERROR_MULTI_SHAPE = 2   # 检测到多个形状
 
-TO_MOVE_ERROR = 4       # 容错后移动状态
+ERROR_WAIT_TIMES = 3    # 容错次数状态
 
-MOVED_STILL_ERROR = 5
+ERROR_TO_MOVE = 4       # 容错后移动状态
+
+ERROR_MOVED = 5
 
 MOVE_TO_INIT_POS = -1
 

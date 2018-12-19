@@ -93,6 +93,8 @@ class ColorContourRecognition:
     def getContours(self, color):
         """寻找轮廓并粗略过滤"""
         self.image, thresh = self.getColorPart(color)
+        # cv2.imshow("thresh",thresh)
+        # cv2.waitKey(0)
         cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL,
                                 cv2.CHAIN_APPROX_SIMPLE)
         # cnt 表示轮廓上的所有点
@@ -102,13 +104,15 @@ class ColorContourRecognition:
             M = cv2.moments(c)
             cX = int(M["m10"] / M["m00"])
             cY = int(M["m01"] / M["m00"])
+            # print("area",area)
             if area > 1000:  # 对区域进行初步筛选，过滤掉一些很小的
                 self.cnts.append(c)
                 cv2.drawContours(self.image, [c], -1, (0, 255, 0), 1)
                 # cv2.circle(self.image, (cX, cY), 1, (255, 0, 0), 1)
         self.cnt_num = len(self.cnts)
-        # cv2.imshow("getContours01", self.image)
-        # cv2.waitKey(0)
+        # print("getContour...")
+        cv2.imshow("getContours01", self.image)
+        cv2.waitKey(0)
         return self.image
 
     def getAccurateContours(self, color):
@@ -195,14 +199,24 @@ class ShapeRecognition(ColorContourRecognition):
             self.shape = 'none'
         else:
             corners = len(tempVertexs)
+            # print("corners",corners)
             p = Point(0, 0)
             if corners == 4:
                 box, rect, wh_ratio = self.getMinRect(approx)
+                # print("wh",wh_ratio)
                 if 0.7 <= wh_ratio <= 2.0:
                     self.shape = 'square'
-                    tempVertexs = p.numberVertexuadrangle(0, tempVertexs, box)
+                    tempVertexs,isError = p.numberVertexuadrangle(0, tempVertexs, box)
+                    if isError == -1:
+                        self.shape = 'none'
+                        return tempVertexs, self.shape
                 else:  # 根据两组对边平行的四边形是平行四边形
-                    tempVertexs = p.numberVertexuadrangle(1, tempVertexs, box)
+                    tempVertexs,isError = p.numberVertexuadrangle(1, tempVertexs, box)
+                    # print("isError",isError)
+                    if isError ==-1:
+                        self.shape = 'none'
+                        return tempVertexs,self.shape
+                    # print("temp",tempVertexs)
                     if p.parallelogramJudge(tempVertexs):
                         self.shape = 'parallelogram'  # 不要忘记考虑False的情况
                     else:
@@ -217,7 +231,7 @@ class ShapeRecognition(ColorContourRecognition):
             # for i in range(0, len(tempVertexs)):
             #     cv2.putText(self.image, str(i), (tempVertexs[i].x, tempVertexs[i].y),
             #                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 255), 2)
-
+        # print("shape",self.shape)
         return tempVertexs, self.shape
 
 
@@ -399,14 +413,16 @@ class Rotate:
 
 def testCamera():
     """ 摄像头测试 """
-    cap = cv2.VideoCapture(0)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1024)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 768)
-    print('启动摄像头...')
-    # return cap
-    ret, real_image = cap.read()
+    # cap = cv2.VideoCapture(0)
+    # cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1024)
+    # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 768)
+    # print('启动摄像头...')
+    # # return cap
+    # ret, real_image = cap.read()
+    real_image = cv2.imread('/Users/lynn/Desktop/test2.jpg')
+    # real_image = cv2.imread('images/catching/50.jpg')
 
-    for i in [1]:
+    for i in [3]:
         if i == 0:
             colorGoal = 'pink'
             shapeGoal = 'triangle'

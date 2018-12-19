@@ -16,14 +16,16 @@ import os
 import sys
 import math
 
-from robot_controller import RobotController
-from RecognitionRotate import ColorContourRecognition, ShapeRecognition, Rotate
+
 import e_image_module
 import assistant_functions
-
-from items import STACK, SET
-
 import fault_tolerant_detection
+
+from items import STACK, SET, Tangram
+from errors import *
+
+from robot_controller import RobotController
+from RecognitionRotate import ColorContourRecognition, ShapeRecognition, Rotate
 ############################################################################################
 class Decision:
     def __init__(self, e_image, camera_flag=0, frame_width=1024, frame_height=768):
@@ -40,6 +42,8 @@ class Decision:
         self._e_image = e_image
 
         self._num_pic = 0
+        self._error_count = 0
+
         self._init_carpos = [400, 100, 510, 180, 0, 0] #初始笛卡尔坐标
         self._detect_carpos = [400, -155, 400, 180, 0, 0]
 
@@ -97,8 +101,8 @@ class Decision:
 
         返回值：
         ----------
-        :return: tuple
-                (y,x)移动方向的矢量坐标
+        :return: int,tuple
+                state, (y,x)
         """
 
         # ld = Analysis()
@@ -106,12 +110,68 @@ class Decision:
         real = ShapeRecognition(0, image)
         real.completeRecognition(color, shape)
 
-        # if real.cnt_num != 1:
+        if real.cnt_num == 1:
+            return OK, real.centerVector
+        else:
+            print('ERROR_NO_SHAPE:', ERROR_NO_SHAPE)
+            state = ERROR_NO_SHAPE
+            while state > 0:
+                state, (x, y) = self.error_handles(state, image, color, shape)
+                real.centerVector = (x, y)
+            return state, real.centerVector
 
 
-        return real.centerVector
+    def get_image_vector_error(self, color, shape):
+        """
+        获取移动方向的矢量坐标。
+        """
+
+        # ld = Analysis()
+        # vec = ld.analy(color, shape, image)
+        ret, image = self._cap.read()
+        real = ShapeRecognition(0, image)
+        real.completeRecognition(color, shape)
+
+        if real.cnt_num == 1:
+            return OK, real.centerVector
+        else:
+            state = ERROR_NO_SHAPE
+            return state, real.centerVector
 
 
+    def error_handles(self, state, image, color, shape):
+        # count = 0
+        print('error handling...')
+        vector = (0, 0)
+        if state == ERROR_NO_SHAPE or state == ERROR_MULTI_SHAPE:
+            state = ERROR_WAIT_TIMES
+            self._error_count = 0
+
+        elif state == ERROR_WAIT_TIMES:
+            if self._error_count <= 3:
+                time.sleep(1)
+                state, vector = self.get_image_vector_error(color, shape)
+                self._error_count += 1
+                print('Error count: ', self._error_count)
+                if state != OK:
+                    state = ERROR_WAIT_TIMES
+            else:
+                state = ERROR_TO_MOVE
+                # self._error_count = 0
+
+        elif state == ERROR_TO_MOVE:
+            state = -1
+
+        elif state == ERROR_MOVED:
+            pass
+
+        elif state == MOVE_TO_INIT_POS:
+            pass
+
+        elif state == OK:
+            pass
+
+        return state, vector
 
     def gradually_approach(self, color, shape, offset, error):
         '''
@@ -130,7 +190,8 @@ class Decision:
 
         返回值：
         ----------
-        :return:    None
+        :return: int
+                state
         '''
         # 逐步逼近x轴
         print('***************************************')
@@ -143,7 +204,11 @@ class Decision:
             cv2.imwrite('images/catching/{0}.jpg'.format(self._num_pic), img)
             self._num_pic += 1
 
-            y, x = self.get_image_vector(img, color, shape)
+            state, (y, x) = self.get_image_vector(img, color, shape)
+
+            if state != OK:
+                return state
+
             print('vector: ({0},{1})'.format(x, y))
 
             if math.fabs(x) >= error and math.fabs(y) >= error:
@@ -178,9 +243,10 @@ class Decision:
             else:
                 flag = False
 
+        return OK
 
 
-    def locating(self, color, shape='triangle'):
+    def locating(self, color, shape):
         '''
         逐步逼近定位指定颜色和形状的木块。
 
@@ -204,12 +270,19 @@ class Decision:
         print('first time approach...')
 
         print('offset: %d, error: %d' % (10, 80))
-        self.gradually_approach(color, shape, 10, 80)
+        state = self.gradually_approach(color, shape, 10, 80)
+        if state != OK:
+            return state
+
         print('offset: %d, error: %d' % (5, 30))
-        self.gradually_approach(color, shape, 5, 30)
+        state = self.gradually_approach(color, shape, 5, 30)
+        if state != OK:
+            return state
 
         print('offset: %d, error: %d' % (2, 5))
-        self.gradually_approach(color, shape, 2, 5)
+        state = self.gradually_approach(color, shape, 2, 5)
+        if state != OK:
+            return state
 
         self._robot_instance.move_car_by_offset(offset_z=-100)  # z = 410
         # self.delay(5)
@@ -217,12 +290,18 @@ class Decision:
         print('second time approaching...')
 
         print('offset: %d, error: %d' % (10, 80))
-        self.gradually_approach(color, shape, 10, 80)
+        state = self.gradually_approach(color, shape, 10, 80)
+        if state != OK:
+            return state
         print('offset: %d, error: %d' % (5, 30))
-        self.gradually_approach(color, shape, 5, 30)
+        state = self.gradually_approach(color, shape, 5, 30)
+        if state != OK:
+            return state
 
         print('offset: %d, error: %d' % (1, 4))
-        self.gradually_approach(color, shape, 1, 4)
+        state = self.gradually_approach(color, shape, 1, 4)
+        if state != OK:
+            return state
 
         self._robot_instance.move_car_by_offset(offset_z=-50)  # z= 360
         # self.delay(5)
@@ -230,60 +309,21 @@ class Decision:
         print('third time approaching...')
 
         print('offset: %d, error: %d' % (10, 80))
-        self.gradually_approach(color, shape, 10, 80)
+        state = self.gradually_approach(color, shape, 10, 80)
+        if state != OK:
+            return state
+
         print('offset: %d, error: %d' % (5, 30))
-        self.gradually_approach(color, shape, 5, 30)
+        state = self.gradually_approach(color, shape, 5, 30)
+        if state != OK:
+            return state
 
         print('offset: %d, error: %d' % (1, 4))
-        self.gradually_approach(color, shape, 1, 4)
+        state = self.gradually_approach(color, shape, 1, 4)
+        if state != OK:
+            return state
         # 定位逼近完成，接下来将手爪移至木块上方，计算旋转角度，并抓取目标
-
-
-
-    def cal_target_car_pos(self, x, y, x0= 550, y0=0, height=167):
-        '''
-        计算当前抓取的木块在拼图区域的坐标。
-
-        参数：
-        ----------
-        :param x: int
-                像素坐标x(图像坐标系中的y)
-        :param y: int
-                像素坐标y(图像坐标系中的x）
-        :param x0: float
-                拼图区域坐标系原点在世界坐标系中的x坐标(精度：两位小数)
-        :param y0: float
-                拼图区域坐标系原点在世界坐标系中的y坐标(精度：两位小数)
-        :param height: float
-                手臂的高度(精度：两位小数)
-
-        返回值：
-        ----------
-        :return: tuple
-                对应拼图区域的笛卡尔坐标((x,y,z,A,B,C), 精度：两位小数)
-        '''
-        carpos = [round(x0 - x / 3, 2), round(y0 - y / 3, 2), height, 180, 0, 0]
-        return carpos
-
-
-    def get_angle(self, real_image, color, shape):
-        """
-        计算旋转角度。
-        :param real_image:  实物图
-        :param color:       颜色
-        :param shape:       形状
-
-        :return:            旋转角度
-        """
-        mould = ShapeRecognition(1, self._e_image)
-        mould.completeRecognition(color, shape)
-        real = ShapeRecognition(0, real_image)
-        real.completeRecognition(color, shape)
-        rotate = Rotate()
-        ang, flag = rotate.getRotateAngle(real, mould, shape)
-        if flag == True:
-            ang = -ang
-        return ang
+        return OK
 
 
 
@@ -334,7 +374,7 @@ class Decision:
         return ang
 
 
-    def processing(self, item):
+    def processing(self, top):
         """
         拼指定颜色和形状的拼图。
 
@@ -350,10 +390,10 @@ class Decision:
         :return:    None
         """
         print('===================================================')
-        shape = item.shape
-        color = item.color
-        x = item.pos_x
-        y = item.pos_y
+        color = top.color
+        shape = top.shape
+        x = top.pos_x
+        y = top.pos_y
 
         # step1: 获取电子图相应目标信息，并计算拼图区域对应坐标
         # mould = ShapeRecognition(1, self._e_image)
@@ -365,8 +405,11 @@ class Decision:
 
         # 计算拼图区域对应坐标
         target_pos = self.cal_target_car_pos(x=x, y=y)
+
         # step2: 定位指定颜色和形状的木块
-        self.locating(color, shape)
+        state = self.locating(color, shape)
+        if state != OK:
+            return state
         # step3: 计算旋转角度，并抓取目标
         ang = self.grab_tangram(color, shape)
         # step4: 移至拼图对应区域,旋转相应角度，并释放目标
@@ -401,6 +444,7 @@ class Decision:
         # self.delay(0.5)
         self._robot_instance.move_car(self._init_carpos)  # 机械臂移动到初始位置
 
+        return OK
 
     def do_puzzles(self):
         """
@@ -415,9 +459,62 @@ class Decision:
 
         while STACK.is_empty() == False:
             top = STACK.pop() #出栈，拼接栈顶七巧板
+            state = self.processing(top)
+
+            print('STATE: ', state)
+            if state != OK:
+                print('出错！！！')
+                sys.exit()
+
             SET.add(top) # 加入已拼接队列
-            # self.processing(e_image, color, shape)
-            self.processing(top)
+
+
+
+    def cal_target_car_pos(self, x, y, x0=550, y0=0, height=167):
+        '''
+        计算当前抓取的木块在拼图区域的坐标。
+
+        参数：
+        ----------
+        :param x: int
+                像素坐标x(图像坐标系中的y)
+        :param y: int
+                像素坐标y(图像坐标系中的x）
+        :param x0: float
+                拼图区域坐标系原点在世界坐标系中的x坐标(精度：两位小数)
+        :param y0: float
+                拼图区域坐标系原点在世界坐标系中的y坐标(精度：两位小数)
+        :param height: float
+                手臂的高度(精度：两位小数)
+
+        返回值：
+        ----------
+        :return: tuple
+                对应拼图区域的笛卡尔坐标((x,y,z,A,B,C), 精度：两位小数)
+        '''
+        carpos = [round(x0 - x / 3, 2), round(y0 - y / 3, 2), height, 180, 0, 0]
+        return carpos
+
+
+    def get_angle(self, real_image, color, shape):
+        """
+        计算旋转角度。
+        :param real_image:  实物图
+        :param color:       颜色
+        :param shape:       形状
+
+        :return:            旋转角度
+        """
+        mould = ShapeRecognition(1, self._e_image)
+        mould.completeRecognition(color, shape)
+        real = ShapeRecognition(0, real_image)
+        real.completeRecognition(color, shape)
+        rotate = Rotate()
+        ang, flag = rotate.getRotateAngle(real, mould, shape)
+        if flag == True:
+            ang = -ang
+        return ang
+
 
 
 def main():
@@ -432,7 +529,7 @@ def main():
     # assistant_functions.delete_image('images/catching/')
     assistant_functions.save_collected_images('images/catching/')
     start = time.time()
-    e_image = cv2.imread('images/mould/cat01.jpg')
+    e_image = cv2.imread('images/mould/people02.jpg')
     decesion = Decision(e_image) # 传入电子图
     #
 

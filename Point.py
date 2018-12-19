@@ -55,14 +55,24 @@ class Point:
     def numberVertexParallelogram(self, vertex, box):
         """对平行四边形进行编号"""
         break_flag = 0
-        while break_flag == 0:
-            for i in range(0, 4):
-                while break_flag == 0:
-                    for j in range(0, 4):
-                        if abs(vertex[i].x - box[j][0]) <= 10 and abs(
-                                vertex[i].y - box[j][1]) <= 10:
-                            vertexnum0 = i
-                            break_flag = 1
+        # while break_flag == 0:
+        for i in range(0, 4):
+
+            # while break_flag == 0:
+            for j in range(0, 4):
+                if abs(vertex[i].x - box[j][0]) <= 10 and abs(
+                        vertex[i].y - box[j][1]) <= 10:
+                    vertexnum0 = i
+                    break_flag = 1
+                if break_flag == 1:
+                    break
+
+            if break_flag == 1:
+                break
+        if break_flag == 0:
+            print("平行四边形无法编号。。。")
+            vertexnum0 = -1
+
         return vertexnum0
 
     def numberVertexTriangle(self, vertex):
@@ -92,12 +102,16 @@ class Point:
 
         else:
             vertexnum0 = self.numberVertexParallelogram(vertex, box)
-        if vertexnum0 != 0:
+
+        if vertexnum0 != 0 and vertexnum0!=-1:
             self.Reverse(vertex, vertexnum0, 3)
             self.Reverse(vertex, 0, vertexnum0 - 1)
             self.Reverse(vertex, 0, 3)
 
-        return vertex
+
+
+
+        return vertex,vertexnum0
 
     def getSlope(self, p1, p2, flag):
         """计算斜率
