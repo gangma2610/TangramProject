@@ -25,7 +25,7 @@ def get_list(e_image):
         if i == 0:
             color = 'pink'
             shape = 'triangle'
-        elif i == 6:
+        elif i == 1:
             color = 'red'
             shape = 'triangle'
         elif i == 2:
@@ -66,7 +66,7 @@ def set_stack(e_image):
 
 
 if __name__ == '__main__':
-    e_image = cv2.imread('images/mould/cat01.jpg')
+    e_image = cv2.imread('images/mould/test.jpg')
     # cv2.imshow('image', e_image)
     # cv2.waitKey(0)
     # tang = get_list(e_image)

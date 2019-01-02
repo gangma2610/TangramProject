@@ -44,6 +44,21 @@ class Point:
             return p2
 
 
+    def distance(self, p1,p2,p3):
+        """ 判断三条边是否近似相等"""
+        d1 = math.sqrt(pow(p1.x - p2.x, 2) + pow(p1.y - p2.y, 2))
+        d2 = math.sqrt(pow(p2.x - p3.x, 2) + pow(p2.y - p3.y, 2))
+        d3 = math.sqrt(pow(p1.x - p3.x, 2) + pow(p1.y - p3.y, 2))
+        print(str(d1)+"   "+str(d2)+"   "+str(d3))
+        if abs(d1-d2) <= 150 and abs(d3-d1) <= 150:
+            print("yes")
+            return True
+        else:
+            print("no")
+            return False
+
+
+
     def Xmin(self, vertex):
         """寻找正方形x最小的点的下标"""
         min_index = 0
@@ -116,7 +131,7 @@ class Point:
     def getSlope(self, p1, p2, flag):
         """计算斜率
             flag: 1表示模板图"""
-        if 0 <= abs(p1.x - p2.x) <= 15 and p1.y != p2.y:
+        if 0 <= abs(p1.x - p2.x) <= 20 and p1.y != p2.y:
             slope = float("inf")
         else:
             # 邻边斜率
@@ -138,6 +153,7 @@ class Point:
         k23 = self.getSlope(vertex[2], vertex[3], 0)
         k12 = self.getSlope(vertex[1], vertex[2], 0)
         k03 = self.getSlope(vertex[0], vertex[3], 0)
+        print(str(k01)+" "+str(k23)+" "+str(k12)+" "+str(k03))
         if abs(k01 - k23) <= 10 and abs(k12 - k03) <= 10:
             return True
         elif (k01 == float("inf") and k23 == float("inf")) and abs(k12 - k03) <= 10:
@@ -161,6 +177,7 @@ class Point:
         """计算两直线夹角"""
         kmr = self.getSlope(pmid, pright, 0)
         kml = self.getSlope(pmid, pleft, 0)
+        # print("kmr,kml"+str(kmr)+" "+str(kml))
         # 求01与02;12与01的夹角
         # （1）存在一条边的斜率不存在时，夹角 = |90-a|
         if kmr == float("inf") or kml == float("inf"):
@@ -179,9 +196,13 @@ class Point:
 
     def triangleJudge(self, vertex):
         """等腰直角三角形判别：求两组夹角是否为45度"""
-        ang102 = self.includedAngleCalculate(vertex[2], vertex[0], vertex[1])
-        ang210 = self.includedAngleCalculate(vertex[2], vertex[1], vertex[0])
-        if abs(ang102 - 45) <= 30 and abs(ang210 - 45) <= 30:
+        if self.distance(vertex[0], vertex[1], vertex[2]):
             return True
+            # ang102 = self.includedAngleCalculate(vertex[2], vertex[0], vertex[1])
+            # ang210 = self.includedAngleCalculate(vertex[2], vertex[1], vertex[0])
+            # if abs(ang102 - 45) <= 30 and abs(ang210 - 45) <= 30:
+            #     return True
+            # else:
+            #     return False
         else:
             return False

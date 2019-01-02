@@ -173,6 +173,7 @@ class Decision:
 
         return state, vector
 
+
     def gradually_approach(self, color, shape, offset, error):
         '''
         逐步逼近目标。
@@ -327,7 +328,7 @@ class Decision:
 
 
 
-    def grab_tangram(self, color, shape, x_distance=44, y_distance = 6.5, height=164): #height = 167
+    def grab_tangram(self, color, shape, x_distance=42, y_distance = 6, height=165): #height = 164
         """
         目标定位到视野中心后，将手爪移至目标上方，计算旋转角度，然后抓取目标，进行旋转。
 
@@ -362,13 +363,13 @@ class Decision:
             sys.exit()
 
         # 降低高度，以便抓取目
-        self._robot_instance.move_car_by_offset(offset_z=-196)  # z = 164
+        self._robot_instance.move_car_by_offset(offset_z=-195)  # z = 165
         # self.delay(5)
         # 抓取目标
         self._robot_instance.control_paw(5)
         self.delay(12)  # time = 10
         # 机械臂手爪上升至第三次逼近高度
-        self._robot_instance.move_car_by_offset(offset_z=193)  # z = 360
+        self._robot_instance.move_car_by_offset(offset_z=195)  # z = 360
         # self.delay(5)
 
         return ang
@@ -529,7 +530,7 @@ def main():
     # assistant_functions.delete_image('images/catching/')
     assistant_functions.save_collected_images('images/catching/')
     start = time.time()
-    e_image = cv2.imread('images/mould/people02.jpg')
+    e_image = cv2.imread('images/mould/e_image.jpg')
     decesion = Decision(e_image) # 传入电子图
     #
 
