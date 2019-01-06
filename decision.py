@@ -54,6 +54,7 @@ class Decision:
         self._cap = cv2.VideoCapture(camera_flag)
         self._cap.set(cv2.CAP_PROP_FRAME_WIDTH, frame_width)
         self._cap.set(cv2.CAP_PROP_FRAME_HEIGHT, frame_height)
+        self._cap.set()
 
         ret, img = self._cap.read()
         print('摄像头就绪.')
