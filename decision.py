@@ -54,7 +54,7 @@ class Decision:
         self._cap = cv2.VideoCapture(camera_flag)
         self._cap.set(cv2.CAP_PROP_FRAME_WIDTH, frame_width)
         self._cap.set(cv2.CAP_PROP_FRAME_HEIGHT, frame_height)
-        self._cap.set()
+        # self._cap.set()
 
         ret, img = self._cap.read()
         print('摄像头就绪.')
@@ -531,7 +531,7 @@ def main():
     # assistant_functions.delete_image('images/catching/')
     assistant_functions.save_collected_images('images/catching/')
     start = time.time()
-    e_image = cv2.imread('images/mould/e_image.jpg')
+    e_image = cv2.imread('images/mould/people02.jpg')
     decesion = Decision(e_image) # 传入电子图
     #
 

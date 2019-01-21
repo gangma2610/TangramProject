@@ -262,8 +262,8 @@ class ShapeRecognition(ColorContourRecognition):
         self.cnts = []
         self.cnts = tempCnt
         self.cnt_num = len(self.cnts)
-        cv2.imshow("filteredImage", self.image)
-        cv2.waitKey(0)
+        # cv2.imshow("filteredImage", self.image)
+        # cv2.waitKey(0)
         return tempVertexsfiltered, self.image
 
     def ultimateFilter(self, colorGoal, shapeGoal):
@@ -308,8 +308,9 @@ class ShapeRecognition(ColorContourRecognition):
                         if area >= goalArea:
                             goalArea = area
                             goalIndex = cntIndex
-                else:
-                    goalIndex = index_temp[0]
+                elif len(index_temp) ==1:
+                        goalIndex = index_temp[0]
+
 
             elif colorGoal == 'red':
                 for cntIndex in range(0, self.cnt_num):
@@ -445,16 +446,16 @@ class Rotate:
 
 def testCamera():
     """ 摄像头测试 """
-    cap = cv2.VideoCapture(0)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1024)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 768)
-    # print('启动摄像头...')
-    # # return cap
-    ret, real_image = cap.read()
+    # cap = cv2.VideoCapture(0)
+    # cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1024)
+    # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 768)
+    # # print('启动摄像头...')
+    # # # return cap
+    # ret, real_image = cap.read()
     # real_image = cv2.imread('/Users/lynn/Desktop/1.jpg')
-    # real_image = cv2.imread('images/catching/143.jpg')
+    real_image = cv2.imread('images/catching/132.jpg')
 
-    for i in [2]:
+    for i in [6]:
         if i == 0:
             colorGoal = 'pink'
             shapeGoal = 'triangle'
