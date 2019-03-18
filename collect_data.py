@@ -87,8 +87,8 @@ def get_result(e_image_list, real_image_list):
     print('************************************************************')
     print('\n电子图中心点坐标:\n', e_image_list)
     print('\n实物图图中心点坐标：\n', real_image_list)
-    print('\ne_distances:\n', e_distances)
-    print('\nreal_distances: ', real_distances)
+    # print('\ne_distances:\n', e_distances)
+    # print('\nreal_distances: ', real_distances)
     print('\nresult: \n')
 
     for i in range(21):
@@ -97,6 +97,7 @@ def get_result(e_image_list, real_image_list):
     print('\n方差：', round(np.var(result), 2))
     print('\n标准差：', round(np.std(result), 2))
     print('\n************************************************************\n')
+    # 写入CSV文件
     write_result = result
     write_result = np.round(write_result, 2)
     write_result = np.append(write_result, round(np.mean(result), 2))
@@ -107,40 +108,31 @@ def get_result(e_image_list, real_image_list):
     return write_result
 
 
-
 def add_to_csv(datas, path='res/results.csv'):
     out = open(path, 'a', newline='')
     csv_writer = csv.writer(out, dialect='excel')
     # csv_writer = csv.writer(path, 'w', newline='')
     # print(len(header_list))
     csv_writer.writerow(datas)
-    pass
-
-
 
 
 if __name__ == '__main__':
-    # data = []
-    # write_to_csv(data)
-    # 添加头
     # add_to_csv(header_list)
-    # print('head list: ', len(header_list))
     e_image = cv2.imread('images/mould/people02.jpg')
     e_image_list = get_centers(e_image, 1)
-    e_distances = cal_errors(e_image_list, 3)
 
     print('********************************')
     print('\n\t图1\n')
     real_image = cv2.imread('/Users/lynn/Desktop/img/1.jpg')
     real_image_list = get_centers(real_image, 0)
     get_result(e_image_list, real_image_list)
-    #
+
     print('********************************')
     print('\n\t图2\n')
     real_image = cv2.imread('/Users/lynn/Desktop/img/2.jpg')
     real_image_list = get_centers(real_image, 0)
     get_result(e_image_list, real_image_list)
-    #
+
     print('********************************')
     print('\n\t图3\n')
     real_image = cv2.imread('/Users/lynn/Desktop/img/3.jpg')

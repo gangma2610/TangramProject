@@ -11,19 +11,16 @@ import cv2
 import math
 import pickle
 import matplotlib.pyplot as plt
-
 import time
 import os
 import sys
 import math
 
-
 import e_image_module
 import assistant
 import fault_tolerant_detection
-
 from items import *
-
+from collect_data import *
 from robot_controller import RobotController
 from RecognitionRotate import ColorContourRecognition, ShapeRecognition, Rotate
 ############################################################################################
@@ -443,8 +440,11 @@ class Decision:
         cv2.imwrite('images/catching/{0}.jpg'.format(self._num_pic), real_img)
         self._num_pic += 1
         fault_tolerant_detection.puzzled_detection(real_img)
-        # self._robot_instance.control_paw(4)
-        # self.delay(0.5)
+
+        # 统计误差
+        if len(SET) == 7:
+            self.get_datas(real_img)
+
         self._robot_instance.move_car(self._init_carpos)  # 机械臂移动到初始位置
 
         return OK
@@ -517,6 +517,26 @@ class Decision:
         if flag == True:
             ang = -ang
         return ang
+
+
+    def get_datas(self, real_image):
+        '''
+        计算误差的各个参数。
+
+        参数：
+        ----------
+        :param real_image:  实际捕获图像
+        :return:            None
+        '''
+        try:
+            e_image_list = get_centers(self._e_image, 1)
+            real_image_list = get_centers(real_image, 0)
+        except:
+            print('获取数据时，图像处理出错！！！')
+            cv2.imwrite('error.jpg', real_image)
+            sys.exit()
+        else:
+            get_result(e_image_list, real_image_list)
 
 
 
