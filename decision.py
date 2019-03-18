@@ -22,8 +22,7 @@ import e_image_module
 import assistant_functions
 import fault_tolerant_detection
 
-from items import STACK, SET, Tangram
-from errors import *
+from items import *
 
 from robot_controller import RobotController
 from RecognitionRotate import ColorContourRecognition, ShapeRecognition, Rotate
