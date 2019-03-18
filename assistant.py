@@ -3,7 +3,7 @@
 # @Time    : 2018/11/13 12:56
 # @Author  : Lynn
 # @Site    : 
-# @File    : assistant_functions.py
+# @File    : assistant.py
 # @Software: PyCharm
 import os
 import time

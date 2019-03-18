@@ -19,7 +19,7 @@ import math
 
 
 import e_image_module
-import assistant_functions
+import assistant
 import fault_tolerant_detection
 
 from items import *
@@ -54,7 +54,8 @@ class Decision:
         self._cap = cv2.VideoCapture(camera_flag)
         self._cap.set(cv2.CAP_PROP_FRAME_WIDTH, frame_width)
         self._cap.set(cv2.CAP_PROP_FRAME_HEIGHT, frame_height)
-        # self._cap.set()
+
+
 
         ret, img = self._cap.read()
         print('摄像头就绪.')
@@ -276,7 +277,6 @@ class Decision:
         if state != OK:
             return state
 
-
         print('offset: %d, error: %d' % (5, 30))
         state = self.gradually_approach(color, shape, 5, 30)
         if state != OK:
@@ -330,7 +330,7 @@ class Decision:
 
 
 
-    def grab_tangram(self, color, shape, x_distance=42, y_distance = 6, height=165): #height = 164
+    def grab_tangram(self, color, shape, x_distance=38, y_distance = 3.5, height=169): #height = 165
         """
         目标定位到视野中心后，将手爪移至目标上方，计算旋转角度，然后抓取目标，进行旋转。
 
@@ -365,13 +365,13 @@ class Decision:
             sys.exit()
 
         # 降低高度，以便抓取目
-        self._robot_instance.move_car_by_offset(offset_z=-195)  # z = 165
+        self._robot_instance.move_car_by_offset(offset_z=-196)  # z = 164
         # self.delay(5)
         # 抓取目标
         self._robot_instance.control_paw(5)
         self.delay(12)  # time = 10
         # 机械臂手爪上升至第三次逼近高度
-        self._robot_instance.move_car_by_offset(offset_z=195)  # z = 360
+        self._robot_instance.move_car_by_offset(offset_z=196)  # z = 360
         # self.delay(5)
 
         return ang
@@ -425,9 +425,9 @@ class Decision:
         print('旋转 %.2f度...' % ang)
         self._robot_instance.move_car_by_offset(offset_C=round(ang, 2))
         # self.delay(11)
-        print('z轴降低 %d mm，高度：%d ' % (31, 170))
+        # print('z轴降低 %d mm，高度：%d ' % (31, 170))
         self._robot_instance.set_speed(1)
-        self._robot_instance.move_car_by_offset(offset_z=-35)  # z = 172 #z=165
+        self._robot_instance.move_car_by_offset(offset_z=-31)
         self._robot_instance.set_speed(4)
         # self.delay()
 
@@ -520,30 +520,30 @@ class Decision:
 
 
 
-def main():
-    """
-    测试机器人逐步逼近目标。
-
-    返回值：
-    ----------
-    :return: None
-    ----------
-    """
-    # assistant_functions.delete_image('images/catching/')
-    assistant_functions.save_collected_images('images/catching/')
-    start = time.time()
-    e_image = cv2.imread('images/mould/people02.jpg')
-    decesion = Decision(e_image) # 传入电子图
-    #
-
-    e_image_module.set_stack(e_image)
-    decesion.do_puzzles()
-
-    print('end!!!')
-    end = time.time()
-    print('time: {}'.format(int(end - start)))
-
-
-
-if __name__ == '__main__':
-    main()
+# def main():
+#     """
+#     测试机器人逐步逼近目标。
+#
+#     返回值：
+#     ----------
+#     :return: None
+#     ----------
+#     """
+#     # assistant.delete_image('images/catching/')
+#     assistant.save_collected_images('images/catching/')
+#     start = time.time()
+#     e_image = cv2.imread('images/mould/people02.jpg')
+#     decesion = Decision(e_image) # 传入电子图
+#     #
+#
+#     e_image_module.set_stack(e_image)
+#     decesion.do_puzzles()
+#
+#     print('end!!!')
+#     end = time.time()
+#     print('time: {}'.format(int(end - start)))
+#
+#
+#
+# if __name__ == '__main__':
+#     main()

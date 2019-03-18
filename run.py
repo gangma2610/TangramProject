@@ -16,10 +16,10 @@ def main():
     ----------
     :return: None
     """
-    # assistant_functions.delete_image('images/catching/')
-    assistant_functions.save_collected_images('images/catching/')
+    # assistant.delete_image('images/catching/')
+    assistant.save_collected_images('images/catching/')
     start = time.time()
-    e_image = cv2.imread('images/mould/cat01.jpg')
+    e_image = cv2.imread('images/mould/people02.jpg')
     decesion = Decision(e_image)  # 传入电子图
     #
 
