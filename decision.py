@@ -5,6 +5,7 @@
 # @Site    : 
 # @File    : decision.py
 # @Software: PyCharm
+
 import numpy as np
 import cv2
 import math
@@ -275,6 +276,7 @@ class Decision:
         state = self.gradually_approach(color, shape, 10, 80)
         if state != OK:
             return state
+
 
         print('offset: %d, error: %d' % (5, 30))
         state = self.gradually_approach(color, shape, 5, 30)

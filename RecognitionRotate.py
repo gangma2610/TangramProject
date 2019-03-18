@@ -152,7 +152,7 @@ class ShapeRecognition(ColorContourRecognition):
     def getDeviationAngle(self):
         """ 返回斜边角度 """
         p = Point(0, 0)
-        slope = p.getSlope(self.vertex[0], self.vertex[1], self.id)
+        slope = p.getSlope(self.vertex[0], self.vertex[1], self.id, 10)
         self.hypotenusAngle = p.angle(slope)
 
         return self.hypotenusAngle
@@ -176,9 +176,9 @@ class ShapeRecognition(ColorContourRecognition):
             for cornerIndex in range(0, corners):
                 singleTempVertex = Point(approx[cornerIndex][0][0], approx[cornerIndex][0][1])
                 tempVertexs.append(singleTempVertex)
-                # cv2.circle(self.image,
-                #            (tempVertexs[cornerIndex].x, tempVertexs[cornerIndex].y), 2,
-                #            (255, 0, 0), 2)
+                cv2.circle(self.image,
+                           (tempVertexs[cornerIndex].x, tempVertexs[cornerIndex].y), 2,
+                           (255, 0, 0), 2)
         else:
             pass  # tempVertexs为空
         return tempVertexs, approx
@@ -222,7 +222,7 @@ class ShapeRecognition(ColorContourRecognition):
                     if p.parallelogramJudge(tempVertexs):
                         self.shape = 'parallelogram'  # 不要忘记考虑False的情况
                     else:
-                        print("dsl")
+                        # print("dsl")
                         self.shape = 'none'
             else:
                 tempVertexs = p.numberVertexTriangle(tempVertexs)  # 对三角形进行编号
@@ -245,11 +245,14 @@ class ShapeRecognition(ColorContourRecognition):
         k = 0
         # for i in range(0,len(self.cnts)):
         # tempCnt = self.cnts
+
         while k < len(self.cnts):
             c = self.cnts[k]
             tempVertexs, shapeTemp = self.shapeAlysis(c)
+            # print("第二次过滤，形状：", shapeTemp)
             k += 1
             if shapeTemp == 'none':
+                # print("形状为空")
                 continue
             if shapeTemp == shapeGoal:
                 tempCnt.append(c)
@@ -277,7 +280,7 @@ class ShapeRecognition(ColorContourRecognition):
             print("没有检测到轮廓！")
             # exit()
         else:  # 针对粉色和紫色、红色和橙色
-            print("before self.cntnum",self.cnt_num)
+            # print("before self.cntnum",self.cnt_num)
             goalArea = cv2.contourArea(self.cnts[0])
             # 针对粉色和紫色，目标一定是多个轮廓中面积最大的一个
             if colorGoal == 'pink' or colorGoal == 'purple' or colorGoal == 'orange':
@@ -296,21 +299,20 @@ class ShapeRecognition(ColorContourRecognition):
                         cX = int(M["m10"] / M["m00"])
                         cY = int(M["m01"] / M["m00"])
                         if abs(cX-cX_temp) <= 10 and abs(cY-cY_temp) <= 10:
-                            print("pass...")
+                            # print("pass...")
                             pass
                         else:
-                            print("this is cntindex",cntIndex)
+                            # print("this is cntindex",cntIndex)
                             index_temp.append(cntIndex)
                 if len(index_temp) > 1:
-                    print("self.cnt_num>1")
+                    # print("self.cnt_num>1")
                     for cntIndex in index_temp:
                         area = cv2.contourArea(self.cnts[cntIndex])
                         if area >= goalArea:
                             goalArea = area
                             goalIndex = cntIndex
-                elif len(index_temp) ==1:
-                        goalIndex = index_temp[0]
-
+                else:
+                    goalIndex = index_temp[0]
 
             elif colorGoal == 'red':
                 for cntIndex in range(0, self.cnt_num):
@@ -344,7 +346,7 @@ class ShapeRecognition(ColorContourRecognition):
             self.getDeviationAngle()  # 计算斜边角度
         else:
             cv2.imwrite('images/template/wrong.jpg', self.image)
-            print("最终轮廓数：", self.cnt_num)
+            # print("最终轮廓数：", self.cnt_num)
 
             # exit()
 
@@ -370,9 +372,9 @@ class Rotate:
     def getRotateAngle(self, capImage, mouldImage, shapeGoal):
         """ 获取旋转角度 """
         deviationAngle = capImage.hypotenusAngle - mouldImage.hypotenusAngle
-        print("capImage hypotenusAngle:", capImage.hypotenusAngle)
-        print("mould hypotenusAngle:", mouldImage.hypotenusAngle)
-        print("deviationAngle:", deviationAngle)
+        # print("capImage hypotenusAngle:", capImage.hypotenusAngle)
+        # print("mould hypotenusAngle:", mouldImage.hypotenusAngle)
+        # print("deviationAngle:", deviationAngle)
         self.rotateAngle = deviationAngle
         overturnFlag = self.whetherOverturn(capImage, mouldImage, shapeGoal)  # 是否需要翻转，True翻转
         if overturnFlag:
@@ -449,13 +451,22 @@ def testCamera():
     # cap = cv2.VideoCapture(0)
     # cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1024)
     # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 768)
-    # # print('启动摄像头...')
-    # # # return cap
+    # print('启动摄像头...')
+    # return cap
     # ret, real_image = cap.read()
-    # real_image = cv2.imread('/Users/lynn/Desktop/1.jpg')
-    real_image = cv2.imread('images/catching/132.jpg')
+    # cv2.imshow("test", real_image)
+    # cv2.waitKey(0)
+    # cv2.imwrite("images/results/3.jpg", real_image)
+    # real_image = cv2.imread('/Users/lynn/Desktop/test2.jpg')
+    # real_image = cv2.imread('/Users/xiaoxiao/Desktop/图像采集/20190121210537/75.jpg')
+    real_image = cv2.imread('images/results/1.jpg')
+    # for i in range(28, 29):
+    #     path = 'images/catching/'+str(i)+'.jpg'
+    #     # # path = '/Users/xiaoxiao/Desktop/七巧板/图像采集/20190121201529/'+str(i)+'.jpg'
+    #     # print(path)
+    #     real_image = cv2.imread(path)
 
-    for i in [6]:
+    for i in [0, 1, 2, 3, 4, 5, 6]:
         if i == 0:
             colorGoal = 'pink'
             shapeGoal = 'triangle'
@@ -487,20 +498,20 @@ def testCamera():
         # rotate = Rotate()
         # angle = rotate.getRotateAngle(real, mould, shapeGoal)
         # print(colorGoal + " angle", angle)
-        # cv2.imwrite("images/results/" + str(image_index) + str(colorGoal) + '.jpg', real.getImage())
+    # cv2.imwrite("images/results/1.jpg", real.getImage())
     # return image
 
 def recognitionRotate():  # 完整测试
 
     # capPath = "images/figured/01.jpg"
     # mould_image = testCamera()
-    for image_index in range(1,4):
+    for image_index in range(0, 229):
         mouldPath = 'images/mould/1.jpg'
         mould_image = cv2.imread(mouldPath)
         print("image_index",image_index)
         # cap = testCamera()
         # ret, real_image = cap.read()
-        capPath = "images/Error/"
+        capPath = "images/figured2/"
         # cappath = "images/simpleImage/blue/"
         # mouldpath = "images/mould/"
         capPath += str(image_index) + ".jpg"
@@ -511,7 +522,7 @@ def recognitionRotate():  # 完整测试
         # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 768)
         # print('启动摄像头...')
         # for i in range(6, 7):
-        for i in [0,1,6]:
+        for i in [0, 1, 2, 3, 4, 5, 6]:
             if i == 0:
                 colorGoal = 'pink'
                 shapeGoal = 'triangle'

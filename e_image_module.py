@@ -21,7 +21,7 @@ def clear_stack():
 def get_list(e_image):
     info = []
     # for i in range(0, 7):
-    for i in [5, 6]:
+    for i in [0, 1, 2, 3, 4, 5, 6]:
         if i == 0:
             color = 'pink'
             shape = 'triangle'

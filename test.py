@@ -37,8 +37,8 @@ def main():
     robot_instance = RobotController()
 
     # 笛卡尔坐标运动
-    robot_instance.move_car(init_pos)
-    # robot_instance.move_car(test_pos)
+    # robot_instance.move_car(init_pos)
+    robot_instance.move_car(test_pos)
     # 关节坐标运动
     # robot_instance.move_axis(init_pos_axis)
 

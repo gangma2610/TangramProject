@@ -49,12 +49,12 @@ class Point:
         d1 = math.sqrt(pow(p1.x - p2.x, 2) + pow(p1.y - p2.y, 2))
         d2 = math.sqrt(pow(p2.x - p3.x, 2) + pow(p2.y - p3.y, 2))
         d3 = math.sqrt(pow(p1.x - p3.x, 2) + pow(p1.y - p3.y, 2))
-        print(str(d1)+"   "+str(d2)+"   "+str(d3))
+        # print(str(d1)+"   "+str(d2)+"   "+str(d3))
         if abs(d1-d2) <= 150 and abs(d3-d1) <= 150:
-            print("yes")
+            # print("yes")
             return True
         else:
-            print("no")
+            # print("no")
             return False
 
 
@@ -85,7 +85,7 @@ class Point:
             if break_flag == 1:
                 break
         if break_flag == 0:
-            print("平行四边形无法编号。。。")
+            # print("平行四边形无法编号。。。")
             vertexnum0 = -1
 
         return vertexnum0
@@ -128,10 +128,10 @@ class Point:
 
         return vertex,vertexnum0
 
-    def getSlope(self, p1, p2, flag):
+    def getSlope(self, p1, p2, flag, threshold=10):
         """计算斜率
             flag: 1表示模板图"""
-        if 0 <= abs(p1.x - p2.x) <= 20 and p1.y != p2.y:
+        if 0 <= abs(p1.x - p2.x) <= threshold and p1.y != p2.y:
             slope = float("inf")
         else:
             # 邻边斜率
@@ -149,11 +149,11 @@ class Point:
 
     def parallelogramJudge(self, vertex):
         """平行四边形判别：两组对边分别平行的四边形是平行四边形"""
-        k01 = self.getSlope(vertex[0], vertex[1], 0)
-        k23 = self.getSlope(vertex[2], vertex[3], 0)
-        k12 = self.getSlope(vertex[1], vertex[2], 0)
-        k03 = self.getSlope(vertex[0], vertex[3], 0)
-        print(str(k01)+" "+str(k23)+" "+str(k12)+" "+str(k03))
+        k01 = self.getSlope(vertex[0], vertex[1], 0, 15)
+        k23 = self.getSlope(vertex[2], vertex[3], 0, 15)
+        k12 = self.getSlope(vertex[1], vertex[2], 0, 15)
+        k03 = self.getSlope(vertex[0], vertex[3], 0, 15)
+        # print(str(k01)+" "+str(k23)+" "+str(k12)+" "+str(k03))
         if abs(k01 - k23) <= 10 and abs(k12 - k03) <= 10:
             return True
         elif (k01 == float("inf") and k23 == float("inf")) and abs(k12 - k03) <= 10:
@@ -175,9 +175,8 @@ class Point:
 
     def includedAngleCalculate(self, pleft, pmid, pright):
         """计算两直线夹角"""
-        kmr = self.getSlope(pmid, pright, 0)
-        kml = self.getSlope(pmid, pleft, 0)
-        # print("kmr,kml"+str(kmr)+" "+str(kml))
+        kmr = self.getSlope(pmid, pright, 0, 10)
+        kml = self.getSlope(pmid, pleft, 0, 10)
         # 求01与02;12与01的夹角
         # （1）存在一条边的斜率不存在时，夹角 = |90-a|
         if kmr == float("inf") or kml == float("inf"):
@@ -187,6 +186,8 @@ class Point:
             elif kml != float("inf"):
                 angkml = self.angle(kml)
                 angmid = abs(90 - angkml)
+            else:
+                angmid = float("inf")
             # print("有垂直，角度为：", angmid)
         else:
             angmid = abs((kml - kmr)/(1+kmr*kml))  # 45度时，ang102=1
@@ -197,12 +198,14 @@ class Point:
     def triangleJudge(self, vertex):
         """等腰直角三角形判别：求两组夹角是否为45度"""
         if self.distance(vertex[0], vertex[1], vertex[2]):
-            return True
-            # ang102 = self.includedAngleCalculate(vertex[2], vertex[0], vertex[1])
-            # ang210 = self.includedAngleCalculate(vertex[2], vertex[1], vertex[0])
-            # if abs(ang102 - 45) <= 30 and abs(ang210 - 45) <= 30:
-            #     return True
-            # else:
-            #     return False
+            ang102 = self.includedAngleCalculate(vertex[2], vertex[0], vertex[1])
+            ang210 = self.includedAngleCalculate(vertex[2], vertex[1], vertex[0])
+            if ang210 == float("inf") or ang102 == float("inf"):
+                return False
+            else:
+                if abs(ang102 - 45) <= 30 and abs(ang210 - 45) <= 30:
+                    return True
+                else:
+                    return False
         else:
             return False

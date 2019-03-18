@@ -75,7 +75,7 @@ def getColorList(id):  # flag=1表示模板颜色匹配
         lower_yellow = np.array([25, 43, 46])
         upper_yellow = np.array([34, 255, 255])
     else:
-        lower_yellow = np.array([25, 43, 180])
+        lower_yellow = np.array([24, 43, 180])
         upper_yellow = np.array([33, 255, 255])
     color_list = []
     color_list.append(lower_yellow)
