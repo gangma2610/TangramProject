@@ -30,7 +30,7 @@ header_list =[
     'orange-yellow', 'orange-green', 'orange-blue', 'orange-purple',
     'yellow-green', 'yellow-blue', 'yellow-purple',
     'green-blue', 'green-purple', 'blue-purple',
-    'average', 'std', 'var'
+    'average', 'var', 'std'
 ]
 
 def get_centers(image, flag=1):
@@ -108,7 +108,7 @@ def get_result(e_image_list, real_image_list):
 
 
 
-def add_to_csv(datas, path='results.csv'):
+def add_to_csv(datas, path='res/results.csv'):
     out = open(path, 'a', newline='')
     csv_writer = csv.writer(out, dialect='excel')
     # csv_writer = csv.writer(path, 'w', newline='')
