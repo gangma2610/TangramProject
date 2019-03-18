@@ -102,8 +102,8 @@ def get_result(e_image_list, real_image_list):
     write_result = np.append(write_result, round(np.mean(result), 2))
     write_result = np.append(write_result, round(np.var(result), 2))
     write_result = np.append(write_result, round(np.std(result), 2))
-    # add_to_csv(write_result)
-    # print('write result: ', len(write_result))
+    add_to_csv(write_result)
+    print('write result: ', len(write_result))
     return write_result
 
 
