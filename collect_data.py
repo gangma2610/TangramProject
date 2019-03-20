@@ -12,9 +12,10 @@ import numpy as np
 import math
 from RecognitionRotate import ColorContourRecognition, ShapeRecognition
 
-color_dict = {  'pink':0, 'red':1, 'orange':2, 'yellow':3,
-                'green':4, 'blue':5, 'purple':6,
-            }
+color_dict = {
+    'pink':0, 'red':1, 'orange':2, 'yellow':3,
+    'green':4, 'blue':5, 'purple':6,
+}
 
 index_color_dict = {
     0:'pink-red', 1:'pink-orange', 2:'pink-yellow', 3:'pink-green', 4:'pink-blue',
@@ -118,26 +119,26 @@ def add_to_csv(datas, path='res/results.csv'):
 
 if __name__ == '__main__':
     # add_to_csv(header_list)
-    e_image = cv2.imread('images/mould/people02.jpg')
+    e_image = cv2.imread('images/mould/52.jpg')
     e_image_list = get_centers(e_image, 1)
 
     print('********************************')
     print('\n\t图1\n')
-    real_image = cv2.imread('/Users/lynn/Desktop/img/1.jpg')
+    real_image = cv2.imread('images/catching/23.jpg')
     real_image_list = get_centers(real_image, 0)
     get_result(e_image_list, real_image_list)
 
-    print('********************************')
-    print('\n\t图2\n')
-    real_image = cv2.imread('/Users/lynn/Desktop/img/2.jpg')
-    real_image_list = get_centers(real_image, 0)
-    get_result(e_image_list, real_image_list)
-
-    print('********************************')
-    print('\n\t图3\n')
-    real_image = cv2.imread('/Users/lynn/Desktop/img/3.jpg')
-    real_image_list = get_centers(real_image, 0)
-    get_result(e_image_list, real_image_list)
+    # print('********************************')
+    # print('\n\t图2\n')
+    # real_image = cv2.imread('/Users/lynn/Desktop/img/2.jpg')
+    # real_image_list = get_centers(real_image, 0)
+    # get_result(e_image_list, real_image_list)
+    #
+    # print('********************************')
+    # print('\n\t图3\n')
+    # real_image = cv2.imread('/Users/lynn/Desktop/img/3.jpg')
+    # real_image_list = get_centers(real_image, 0)
+    # get_result(e_image_list, real_image_list)
 
 
 

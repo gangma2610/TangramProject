@@ -19,12 +19,22 @@ def main():
     # assistant.delete_image('images/catching/')
     assistant.save_collected_images('images/catching/')
     start = time.time()
-    e_image = cv2.imread('images/mould/people02.jpg')
+    e_image_path = 'images/mould/53.jpg';
+    e_image = cv2.imread(e_image_path)
     decesion = Decision(e_image)  # 传入电子图
     #
 
+    result_path = 'res/res_imgs/' + e_image_path.split('/')[-1]
+
     e_image_module.set_stack(e_image)
-    decesion.do_puzzles()
+
+    try:
+        decesion.do_puzzles()
+    except:
+        print('任务失败！！！')
+    else:
+        decesion.get_datas(result_path)
+
 
     print('end!!!')
     end = time.time()

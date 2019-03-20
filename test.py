@@ -31,20 +31,37 @@ def main():
     init_pos = [400, 100, 510, 180, 0, 0]
     test_pos = [400, 100, 360, 180, 0, 0]
     init_pos_axis = [0, 0, 0, 0, 0, 0]
+    detect_pos =  [400, -155, 400, 180, 0, 0]
     # test_pos = [510, 260, 175, 180, 0, 0]
     # prea = np.array([0, 56, -17, 0, 24, 0])
 
     robot_instance = RobotController()
 
     # 笛卡尔坐标运动
-    # robot_instance.move_car(init_pos)
-    robot_instance.move_car(test_pos)
+    control = 1
+
+    if control ==0 :
+        robot_instance.move_axis(init_pos_axis) # 回零
+    elif control == 1:
+        robot_instance.move_car(init_pos)  # 项目的初始坐标
+    elif control == 2:
+        robot_instance.move_car(test_pos)
+    elif control == 3:
+        robot_instance.move_car(detect_pos)
+    elif control == 4:
+        robot_instance.control_paw(4)  # 张开
+    elif control == 5:
+        robot_instance.control_paw(5)  # 闭合
+    else:
+        pass
+    # robot_instance.move_car(detect_pos)
+    # robot_instance.move_car(test_pos)
     # 关节坐标运动
     # robot_instance.move_axis(init_pos_axis)
 
     # 偏移量运动
     # robot_instance.move_car_by_offset(offset_C = 180) # 笛卡尔偏移量
-    # robot_instance.move_axis_by_offset(offset_a2 = 30) # 关节偏移量
+    # robot_instance.move_axis_by_offset(offset_a6 = 180) # 关节偏移量
 
     # 控制手爪闭合和张开
     # robot_instance.control_paw(5) # 闭合

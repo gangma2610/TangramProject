@@ -222,7 +222,7 @@ class ShapeRecognition(ColorContourRecognition):
                     if p.parallelogramJudge(tempVertexs):
                         self.shape = 'parallelogram'  # 不要忘记考虑False的情况
                     else:
-                        # print("dsl")
+                        print("dsl")
                         self.shape = 'none'
             else:
                 tempVertexs = p.numberVertexTriangle(tempVertexs)  # 对三角形进行编号
@@ -249,10 +249,10 @@ class ShapeRecognition(ColorContourRecognition):
         while k < len(self.cnts):
             c = self.cnts[k]
             tempVertexs, shapeTemp = self.shapeAlysis(c)
-            # print("第二次过滤，形状：", shapeTemp)
+            print("第二次过滤，形状：", shapeTemp)
             k += 1
             if shapeTemp == 'none':
-                # print("形状为空")
+                print("形状为空")
                 continue
             if shapeTemp == shapeGoal:
                 tempCnt.append(c)
@@ -280,7 +280,7 @@ class ShapeRecognition(ColorContourRecognition):
             print("没有检测到轮廓！")
             # exit()
         else:  # 针对粉色和紫色、红色和橙色
-            # print("before self.cntnum",self.cnt_num)
+            print("before self.cntnum",self.cnt_num)
             goalArea = cv2.contourArea(self.cnts[0])
             # 针对粉色和紫色，目标一定是多个轮廓中面积最大的一个
             if colorGoal == 'pink' or colorGoal == 'purple' or colorGoal == 'orange':
@@ -299,13 +299,13 @@ class ShapeRecognition(ColorContourRecognition):
                         cX = int(M["m10"] / M["m00"])
                         cY = int(M["m01"] / M["m00"])
                         if abs(cX-cX_temp) <= 10 and abs(cY-cY_temp) <= 10:
-                            # print("pass...")
+                            print("pass...")
                             pass
                         else:
-                            # print("this is cntindex",cntIndex)
+                            print("this is cntindex",cntIndex)
                             index_temp.append(cntIndex)
                 if len(index_temp) > 1:
-                    # print("self.cnt_num>1")
+                    print("self.cnt_num>1")
                     for cntIndex in index_temp:
                         area = cv2.contourArea(self.cnts[cntIndex])
                         if area >= goalArea:
@@ -346,7 +346,7 @@ class ShapeRecognition(ColorContourRecognition):
             self.getDeviationAngle()  # 计算斜边角度
         else:
             cv2.imwrite('images/template/wrong.jpg', self.image)
-            # print("最终轮廓数：", self.cnt_num)
+            print("最终轮廓数：", self.cnt_num)
 
             # exit()
 
@@ -372,9 +372,9 @@ class Rotate:
     def getRotateAngle(self, capImage, mouldImage, shapeGoal):
         """ 获取旋转角度 """
         deviationAngle = capImage.hypotenusAngle - mouldImage.hypotenusAngle
-        # print("capImage hypotenusAngle:", capImage.hypotenusAngle)
-        # print("mould hypotenusAngle:", mouldImage.hypotenusAngle)
-        # print("deviationAngle:", deviationAngle)
+        print("capImage hypotenusAngle:", capImage.hypotenusAngle)
+        print("mould hypotenusAngle:", mouldImage.hypotenusAngle)
+        print("deviationAngle:", deviationAngle)
         self.rotateAngle = deviationAngle
         overturnFlag = self.whetherOverturn(capImage, mouldImage, shapeGoal)  # 是否需要翻转，True翻转
         if overturnFlag:
@@ -447,26 +447,29 @@ class Rotate:
 
 
 def testCamera():
-    """ 摄像头测试 """
-    # cap = cv2.VideoCapture(0)
-    # cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1024)
-    # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 768)
-    # print('启动摄像头...')
-    # return cap
-    # ret, real_image = cap.read()
+    cto = 0
+    if cto == 0:
+        """ 摄像头测试 """
+        cap = cv2.VideoCapture(0)
+        cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1024)
+        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 768)
+        print('启动摄像头...')
+        # return cap
+        ret, real_image = cap.read()
+    elif cto == 1:
     # cv2.imshow("test", real_image)
     # cv2.waitKey(0)
     # cv2.imwrite("images/results/3.jpg", real_image)
     # real_image = cv2.imread('/Users/lynn/Desktop/test2.jpg')
     # real_image = cv2.imread('/Users/xiaoxiao/Desktop/图像采集/20190121210537/75.jpg')
-    real_image = cv2.imread('images/results/1.jpg')
+        real_image = cv2.imread('images/catching/90.jpg')
     # for i in range(28, 29):
     #     path = 'images/catching/'+str(i)+'.jpg'
     #     # # path = '/Users/xiaoxiao/Desktop/七巧板/图像采集/20190121201529/'+str(i)+'.jpg'
     #     # print(path)
     #     real_image = cv2.imread(path)
 
-    for i in [0, 1, 2, 3, 4, 5, 6]:
+    for i in [1 ]:
         if i == 0:
             colorGoal = 'pink'
             shapeGoal = 'triangle'

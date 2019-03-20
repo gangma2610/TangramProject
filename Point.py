@@ -49,12 +49,12 @@ class Point:
         d1 = math.sqrt(pow(p1.x - p2.x, 2) + pow(p1.y - p2.y, 2))
         d2 = math.sqrt(pow(p2.x - p3.x, 2) + pow(p2.y - p3.y, 2))
         d3 = math.sqrt(pow(p1.x - p3.x, 2) + pow(p1.y - p3.y, 2))
-        # print(str(d1)+"   "+str(d2)+"   "+str(d3))
+        print(str(d1)+"   "+str(d2)+"   "+str(d3))
         if abs(d1-d2) <= 150 and abs(d3-d1) <= 150:
-            # print("yes")
+            print("yes")
             return True
         else:
-            # print("no")
+            print("no")
             return False
 
 
@@ -85,7 +85,7 @@ class Point:
             if break_flag == 1:
                 break
         if break_flag == 0:
-            # print("平行四边形无法编号。。。")
+            print("平行四边形无法编号。。。")
             vertexnum0 = -1
 
         return vertexnum0
@@ -136,14 +136,14 @@ class Point:
         else:
             # 邻边斜率
             slope = ((-1) * (p1.y) + p2.y) / (p1.x - p2.x)
-            if flag == 1:  # 针对电子图斜率规整的情况，0，1，-1
-                if abs(slope) < 0.2:
-                    slope = 0
-                if abs(abs(slope) - 1) < 0.2:
-                    if slope < 0:
-                        slope = -1
-                    else:
-                        slope = 1
+            # if flag == 1:  # 针对电子图斜率规整的情况，0，1，-1
+            #     if abs(slope) < 0.2:
+            #         slope = 0
+            #     if abs(abs(slope) - 1) < 0.2:
+            #         if slope < 0:
+            #             slope = -1
+            #         else:
+            #             slope = 1
         return slope
 
 
@@ -167,10 +167,10 @@ class Point:
         """由斜率求角度"""
         temp = math.atan(k)
         angle = math.degrees(temp)
-        angle = round(angle)
+        angle = round(angle, 2)
         if angle < 0:
             angle = 180 + angle
-
+        print("angle:", angle)
         return angle
 
     def includedAngleCalculate(self, pleft, pmid, pright):

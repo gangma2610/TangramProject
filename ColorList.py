@@ -44,8 +44,8 @@ def getColorList(id):  # flag=1表示模板颜色匹配
     dict['pink'] = color_list
 
     # 红色
-    # H:0-10 S: 65%-100% V:30%-100%
-    lower_red = np.array([0, 165, 80])
+    # H:0-10 S: 65%-100%(165-255) V:30%-100%
+    lower_red = np.array([0, 160, 80])
     upper_red = np.array([3, 255, 255])
     # H:345-360 S:50%-100% V: 45%-100%
     lower_red2 = np.array([170, 140, 115])
@@ -62,8 +62,8 @@ def getColorList(id):  # flag=1表示模板颜色匹配
         lower_orange = np.array([6, 43, 46])
         upper_orange = np.array([24, 255, 255])
     else:
-        # H:0-6,S:45%-85%,V:60%-100%
-        lower_orange = np.array([0, 115, 153])
+        # H:0-6,S:45%-85%(115-217),V:60%-100%
+        lower_orange = np.array([3, 115, 153])
         upper_orange = np.array([12, 217, 255])
     color_list = []
     color_list.append(lower_orange)

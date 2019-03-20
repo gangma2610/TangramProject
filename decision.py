@@ -194,8 +194,8 @@ class Decision:
                 state
         '''
         # 逐步逼近x轴
-        print('***************************************')
-        print('move_car for x...')
+        # print('***************************************')
+        # print('move_car for x...')
         flag = True
         while flag:
             # catch an image
@@ -209,10 +209,10 @@ class Decision:
             if state != OK:
                 return state
 
-            print('vector: ({0},{1})'.format(x, y))
+            # print('vector: ({0},{1})'.format(x, y))
 
             if math.fabs(x) >= error and math.fabs(y) >= error:
-                print('move: x, y')
+                # print('move: x, y')
                 x_offset = y_offset = offset
                 if x < 0:
                     x_offset = -x_offset
@@ -223,7 +223,7 @@ class Decision:
                 # self.delay()
 
             elif math.fabs(x) >= error:
-                print('move: x')
+                # print('move: x')
                 x_offset = offset
                 if x < 0:
                     x_offset = -x_offset
@@ -232,7 +232,7 @@ class Decision:
                 # self.delay()
 
             elif math.fabs(y) >= error:
-                print('move: y')
+                # print('move: y')
                 y_offset = offset
                 if y < 0:
                     y_offset = -y_offset
@@ -267,19 +267,19 @@ class Decision:
         # self.delay(10)
 
         # 第一次逼近目标
-        print('first time approach...')
+        # print('first time approach...')
 
-        print('offset: %d, error: %d' % (10, 80))
+        # print('offset: %d, error: %d' % (10, 80))
         state = self.gradually_approach(color, shape, 10, 80)
         if state != OK:
             return state
 
-        print('offset: %d, error: %d' % (5, 30))
+        # print('offset: %d, error: %d' % (5, 30))
         state = self.gradually_approach(color, shape, 5, 30)
         if state != OK:
             return state
 
-        print('offset: %d, error: %d' % (2, 5))
+        # print('offset: %d, error: %d' % (2, 5))
         state = self.gradually_approach(color, shape, 2, 5)
         if state != OK:
             return state
@@ -287,18 +287,18 @@ class Decision:
         self._robot_instance.move_car_by_offset(offset_z=-100)  # z = 410
         # self.delay(5)
         # 第二次逼近目标
-        print('second time approaching...')
+        # print('second time approaching...')
 
-        print('offset: %d, error: %d' % (10, 80))
+        # print('offset: %d, error: %d' % (10, 80))
         state = self.gradually_approach(color, shape, 10, 80)
         if state != OK:
             return state
-        print('offset: %d, error: %d' % (5, 30))
+        # print('offset: %d, error: %d' % (5, 30))
         state = self.gradually_approach(color, shape, 5, 30)
         if state != OK:
             return state
 
-        print('offset: %d, error: %d' % (1, 4))
+        # print('offset: %d, error: %d' % (1, 4))
         state = self.gradually_approach(color, shape, 1, 4)
         if state != OK:
             return state
@@ -306,19 +306,19 @@ class Decision:
         self._robot_instance.move_car_by_offset(offset_z=-50)  # z= 360
         # self.delay(5)
         # 第三次逼近目标
-        print('third time approaching...')
+        # print('third time approaching...')
 
-        print('offset: %d, error: %d' % (10, 80))
+        # print('offset: %d, error: %d' % (10, 80))
         state = self.gradually_approach(color, shape, 10, 80)
         if state != OK:
             return state
 
-        print('offset: %d, error: %d' % (5, 30))
+        # print('offset: %d, error: %d' % (5, 30))
         state = self.gradually_approach(color, shape, 5, 30)
         if state != OK:
             return state
 
-        print('offset: %d, error: %d' % (1, 4))
+        # print('offset: %d, error: %d' % (1, 4))
         state = self.gradually_approach(color, shape, 1, 4)
         if state != OK:
             return state
@@ -327,7 +327,7 @@ class Decision:
 
 
 
-    def grab_tangram(self, color, shape, x_distance=38, y_distance = 3.5, height=169): #height = 165
+    def grab_tangram(self, color, shape, x_distance=44, y_distance = 5, height=154): #height = 165
         """
         目标定位到视野中心后，将手爪移至目标上方，计算旋转角度，然后抓取目标，进行旋转。
 
@@ -362,13 +362,13 @@ class Decision:
             sys.exit()
 
         # 降低高度，以便抓取目
-        self._robot_instance.move_car_by_offset(offset_z=-196)  # z = 164
+        self._robot_instance.move_car_by_offset(offset_z=-206)  # z = 154
         # self.delay(5)
         # 抓取目标
         self._robot_instance.control_paw(5)
         self.delay(12)  # time = 10
         # 机械臂手爪上升至第三次逼近高度
-        self._robot_instance.move_car_by_offset(offset_z=196)  # z = 360
+        self._robot_instance.move_car_by_offset(offset_z=206)  # z = 360
         # self.delay(5)
 
         return ang
@@ -424,7 +424,7 @@ class Decision:
         # self.delay(11)
         # print('z轴降低 %d mm，高度：%d ' % (31, 170))
         self._robot_instance.set_speed(1)
-        self._robot_instance.move_car_by_offset(offset_z=-31)
+        self._robot_instance.move_car_by_offset(offset_z=-46)
         self._robot_instance.set_speed(4)
         # self.delay()
 
@@ -440,10 +440,6 @@ class Decision:
         cv2.imwrite('images/catching/{0}.jpg'.format(self._num_pic), real_img)
         self._num_pic += 1
         fault_tolerant_detection.puzzled_detection(real_img)
-
-        # 统计误差
-        if len(SET) == 7:
-            self.get_datas(real_img)
 
         self._robot_instance.move_car(self._init_carpos)  # 机械臂移动到初始位置
 
@@ -519,24 +515,25 @@ class Decision:
         return ang
 
 
-    def get_datas(self, real_image):
+    def get_datas(self, res_path):
         '''
         计算误差的各个参数。
-
-        参数：
-        ----------
-        :param real_image:  实际捕获图像
-        :return:            None
         '''
         try:
+            # 移动到拼图检测区域
+            self._robot_instance.move_car(self._detect_carpos)
+            ret, real_image = self._cap.read()
             e_image_list = get_centers(self._e_image, 1)
             real_image_list = get_centers(real_image, 0)
         except:
+            self._robot_instance.move_car(self._init_carpos)
             print('获取数据时，图像处理出错！！！')
-            cv2.imwrite('error.jpg', real_image)
+            cv2.imwrite('res/error.jpg', real_image)
             sys.exit()
         else:
-            get_result(e_image_list, real_image_list)
+            cv2.imwrite(res_path, real_image) # 结果图像写入/res/res_imgs/
+            get_result(e_image_list, real_image_list) # 计算误差并写入 res/results.csv 文件中
+            self._robot_instance.move_car(self._init_carpos)
 
 
 
