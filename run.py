@@ -19,7 +19,7 @@ def main():
     # assistant.delete_image('images/catching/')
     assistant.save_collected_images('images/catching/')
     start = time.time()
-    e_image_path = 'images/mould/53.jpg';
+    e_image_path = 'images/mould/62.jpg';
     e_image = cv2.imread(e_image_path)
     decesion = Decision(e_image)  # 传入电子图
     #
@@ -33,7 +33,10 @@ def main():
     except:
         print('任务失败！！！')
     else:
-        decesion.get_datas(result_path)
+        if len(SET) == 7:
+            decesion.get_datas(result_path)
+        else:
+            print("LEN SIZE : ", len(SET))
 
 
     print('end!!!')

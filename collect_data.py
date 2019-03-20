@@ -119,12 +119,23 @@ def add_to_csv(datas, path='res/results.csv'):
 
 if __name__ == '__main__':
     # add_to_csv(header_list)
-    e_image = cv2.imread('images/mould/52.jpg')
+    e_image = cv2.imread('images/mould/59.jpg')
     e_image_list = get_centers(e_image, 1)
 
     print('********************************')
     print('\n\t图1\n')
-    real_image = cv2.imread('images/catching/23.jpg')
+
+    cto = 1
+    if cto == 0:
+        cap = cv2.VideoCapture(0)
+        cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1024)
+        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 768)
+        ret, real_image = cap.read()
+        cv2.imshow('result', real_image)
+        cv2.waitKey(0)
+        cv2.imwrite('/Users/lynn/Desktop/result.jpg', real_image)
+    else:
+        real_image = cv2.imread('images/catching/18.jpg')
     real_image_list = get_centers(real_image, 0)
     get_result(e_image_list, real_image_list)
 

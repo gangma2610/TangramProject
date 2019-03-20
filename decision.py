@@ -306,8 +306,7 @@ class Decision:
         self._robot_instance.move_car_by_offset(offset_z=-50)  # z= 360
         # self.delay(5)
         # 第三次逼近目标
-        # print('third time approaching...')
-
+        # print('third time approaching...
         # print('offset: %d, error: %d' % (10, 80))
         state = self.gradually_approach(color, shape, 10, 80)
         if state != OK:
@@ -327,7 +326,7 @@ class Decision:
 
 
 
-    def grab_tangram(self, color, shape, x_distance=44, y_distance = 5, height=154): #height = 165
+    def grab_tangram(self, color, shape, x_distance=44, y_distance = 5.5, height=154): #height = 165
         """
         目标定位到视野中心后，将手爪移至目标上方，计算旋转角度，然后抓取目标，进行旋转。
 
