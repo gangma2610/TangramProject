@@ -453,10 +453,10 @@ class Rotate:
 
 
 def testCamera():
-    cto = 1
+    cto = 0
     if cto == 0:
         """ 摄像头测试 """
-        cap = cv2.VideoCapture(1)
+        cap = cv2.VideoCapture(0)
         cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1024)
         cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 768)
         print('启动摄像头...')
@@ -468,14 +468,15 @@ def testCamera():
     # cv2.imwrite("images/results/3.jpg", real_image)
     # real_image = cv2.imread('/Users/lynn/Desktop/test2.jpg')
     # real_image = cv2.imread('/Users/xiaoxiao/Desktop/图像采集/20190121210537/75.jpg')
-        real_image = cv2.imread('images/catching/153.jpg')
+    #     real_image = cv2.imread('images/catching/157.jpg')
+        real_image = cv2.imread('res/res_imgs/63.jpg')
     # for i in range(28, 29):
     #     path = 'images/catching/'+str(i)+'.jpg'
     #     # # path = '/Users/xiaoxiao/Desktop/七巧板/图像采集/20190121201529/'+str(i)+'.jpg'
     #     # print(path)
     #     real_image = cv2.imread(path)
 
-    for i in [0, 1, 2,4,5,6 ]:
+    for i in [4]:
         if i == 0:
             colorGoal = 'pink'
             shapeGoal = 'triangle'

@@ -34,11 +34,13 @@ def main():
     detect_pos =  [400, -155, 400, 180, 0, 0]
     # test_pos = [510, 260, 175, 180, 0, 0]
     # prea = np.array([0, 56, -17, 0, 24, 0])
+    set_pos = [464.0, -142.67, 153.56,180, 0, 0]
 
     robot_instance = RobotController()
 
     # 笛卡尔坐标运动
     control = 1
+
 
     if control ==0 :
         robot_instance.move_axis(init_pos_axis) # 回零
@@ -53,6 +55,7 @@ def main():
     elif control == 5:
         robot_instance.control_paw(5)  # 闭合
     else:
+        robot_instance.move_car(set_pos)
         pass
     # robot_instance.move_car(detect_pos)
     # robot_instance.move_car(test_pos)

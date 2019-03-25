@@ -326,7 +326,7 @@ class Decision:
 
 
 
-    def grab_tangram(self, color, shape, x_distance=44, y_distance = 5.5, height=154): #height = 165
+    def grab_tangram(self, color, shape, x_distance=41, y_distance = 3.5, height=156): #height = 165
         """
         目标定位到视野中心后，将手爪移至目标上方，计算旋转角度，然后抓取目标，进行旋转。
 
@@ -361,13 +361,13 @@ class Decision:
             sys.exit()
 
         # 降低高度，以便抓取目
-        self._robot_instance.move_car_by_offset(offset_z=-206)  # z = 154
+        self._robot_instance.move_car_by_offset(offset_z=-204)  # z = 156
         # self.delay(5)
         # 抓取目标
         self._robot_instance.control_paw(5)
         self.delay(12)  # time = 10
         # 机械臂手爪上升至第三次逼近高度
-        self._robot_instance.move_car_by_offset(offset_z=206)  # z = 360
+        self._robot_instance.move_car_by_offset(offset_z=204)  # z = 360
         # self.delay(5)
 
         return ang
@@ -404,6 +404,7 @@ class Decision:
 
         # 计算拼图区域对应坐标
         target_pos = self.cal_target_car_pos(x=x, y=y)
+        self.write_logs(color + ' : ({}, {})'.format(target_pos[0], target_pos[1]))
 
         # step2: 定位指定颜色和形状的木块
         state = self.locating(color, shape)
@@ -423,13 +424,13 @@ class Decision:
         # self.delay(11)
         # print('z轴降低 %d mm，高度：%d ' % (31, 170))
         self._robot_instance.set_speed(1)
-        self._robot_instance.move_car_by_offset(offset_z=-46)
+        self._robot_instance.move_car_by_offset(offset_z=-44)
         self._robot_instance.set_speed(4)
         # self.delay()
 
         # 释放目标
         self._robot_instance.control_paw(4)
-        self.delay(5)
+        self.delay(3)
 
         # 移到检测位置
         self._robot_instance.move_car(self._detect_carpos)
@@ -535,6 +536,10 @@ class Decision:
             self._robot_instance.move_car(self._init_carpos)
 
 
+    def write_logs(self, string):
+        f = open('log.txt', 'a')
+        f.writelines(string + '\n')
+        f.close()
 
 # def main():
 #     """

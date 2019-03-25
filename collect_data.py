@@ -119,7 +119,8 @@ def add_to_csv(datas, path='res/results.csv'):
 
 if __name__ == '__main__':
     # add_to_csv(header_list)
-    e_image = cv2.imread('images/mould/59.jpg')
+    img_name = '33.jpg'
+    e_image = cv2.imread('images/mould/' + img_name)
     e_image_list = get_centers(e_image, 1)
 
     print('********************************')
@@ -133,9 +134,11 @@ if __name__ == '__main__':
         ret, real_image = cap.read()
         cv2.imshow('result', real_image)
         cv2.waitKey(0)
-        cv2.imwrite('/Users/lynn/Desktop/result.jpg', real_image)
+        cv2.imwrite('res/res_imgs/' + img_name, real_image)
     else:
-        real_image = cv2.imread('images/catching/18.jpg')
+        real_image = cv2.imread('images/catching/77.jpg')
+        # real_image = cv2.imread('res/res_imgs/' + img_name)
+        cv2.imwrite('res/res_imgs/' + img_name, real_image)
     real_image_list = get_centers(real_image, 0)
     get_result(e_image_list, real_image_list)
 
