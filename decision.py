@@ -326,7 +326,7 @@ class Decision:
 
 
 
-    def grab_tangram(self, color, shape, x_distance=41, y_distance = 3.5, height=156): #height = 165
+    def grab_tangram(self, color, shape, x_distance=41.2, y_distance = 3.5, height=156): #height = 165
         """
         目标定位到视野中心后，将手爪移至目标上方，计算旋转角度，然后抓取目标，进行旋转。
 
