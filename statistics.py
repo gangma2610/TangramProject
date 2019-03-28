@@ -10,6 +10,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pylab as plt
 import matplotlib as mpl
+import matplotlib.mlab as mlab
 
 
 header_list =[
@@ -48,11 +49,12 @@ def draw_line_chart():
     print(x)
     # print(y)
 
-    plt.plot(x, dt_avg, 'r-', linewidth=2, label='Average in one trail')
-    plt.plot(x, np.array([all_std]*data.shape[0]), 'm--', linewidth=1, label='Std in all trails')
-    # plt.plot(x, dt_var, 'b-', linewidth=2, label='Var')
+    plt.plot(x, dt_avg, 'r-', linewidth=1, label='Average in one trail')
     plt.plot(x, np.array([avg] * len(dt_avg)), 'r--', linewidth=1, label='Average in all trails')
-    plt.ylim(0, 4)
+    plt.plot(x, np.array([all_std]*data.shape[0]), 'm--', linewidth=1, label='Standard deviation in all trails')
+    # plt.plot(x, dt_var, 'b-', linewidth=2, label='Var')
+
+    plt.ylim(0, 5)
     plt.xlim(1, data.shape[0])
     plt.xlabel('Trails')
     plt.ylabel('Distances (mm)')
@@ -80,27 +82,52 @@ def draw_scatter_chart():
     plt.grid()
     plt.show()
 
+def draw_distribution():
+    data = pd.read_csv('res/results.csv', delimiter=',')
+    print('shape = ', data.shape)
+    dt_avg = np.array(data['average'])
+    print('均值: \n', dt_avg)
+
+
 if __name__ == '__main__':
-    draw_line_chart()
+    # draw_line_chart()
     # draw_scatter_chart()
+    # draw_distribution()
 
     # plt.scatter(x, dt_avg, c='')
-    # data = pd.read_csv('res/results.csv', delimiter=',')
-    # print('shape = ', data.shape)
-    # dt_avg = np.array(data['average'])
-    # dt_var = np.array(data['var'])
-    # dt_std = np.array(data['std'])
-    # avg = np.average(dt_avg)
-    # print('avg = ', avg)
-    # print('均值: \n', dt_avg)
-    # print('方差: \n', dt_var)
-    # print('标准差:\n', dt_std)
-    #
-    # N, M = 20, 20
-    # t1 = np.linspace(0, 10, N)
-    # t2 = np.linspace(0, data.shape[0] + 1, M)
-    # x1, x2 = np.meshgrid(t1, t2)
-    # x_test = np.stack((x1.flat, x2.flat), axis=1)
+    data = pd.read_csv('res/results.csv', delimiter=',')
+
+    print('shape = ', data.shape)
+    dt_avg = np.array(data['average'])
+    # print(dt_avg.max())
+    distribute = np.linspace(0.2, 3.2, 15+1)
+    fenzu = pd.cut(data['average'].values, distribute)
+    print('分组: \n', fenzu)
+    # pinshu = fenzu.value_counts()
+    # print(pinshu)
+    # plt.hist(pinshu)
+    # plt.show()
+    plt.hist(data['average'], bins=15, facecolor='blue', alpha=0.75,rwidth=0.8)
+    plt.savefig('res/hist.jpg')
+    plt.show()
+
+    # fenzu = pd.cut(dt_avg, distribute)
+    # print('分组: \n', fenzu)
+    #  pinshu = fenzu.value_counts() # series 区间-个数
+    # y = np.array(pinshu.tolist()) / 100
+    # print('y = \n', y)
+    # print('code: \n', fenzu.codes) # 标签
+    # print('categories: \n', fenzu.categories)
+    # print('频数:\n', pinshu)
+    # result = pinshu / 100
+    # print('百分比:\n', result )
+    # print('***************')
+    # print('index:\n',pinshu.index.categories)
+    # x = pinshu.index.categories
+    # plt.hist(pinshu)
+    # plt.show()
+
+
 
 
 
