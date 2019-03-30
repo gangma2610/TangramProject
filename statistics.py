@@ -88,28 +88,34 @@ def draw_distribution():
     dt_avg = np.array(data['average'])
     print('均值: \n', dt_avg)
 
+def draw_hist():
+    data = pd.read_csv('res/results.csv', delimiter=',')
+    plt.hist(data['average'], bins=15, facecolor='blue', alpha=0.75, rwidth=0.8)
+    plt.savefig('res/hist.jpg')
+    plt.show()
 
 if __name__ == '__main__':
+    draw_hist()
     # draw_line_chart()
     # draw_scatter_chart()
     # draw_distribution()
 
     # plt.scatter(x, dt_avg, c='')
-    data = pd.read_csv('res/results.csv', delimiter=',')
-
-    print('shape = ', data.shape)
-    dt_avg = np.array(data['average'])
-    # print(dt_avg.max())
-    distribute = np.linspace(0.2, 3.2, 15+1)
-    fenzu = pd.cut(data['average'].values, distribute)
-    print('分组: \n', fenzu)
-    # pinshu = fenzu.value_counts()
-    # print(pinshu)
-    # plt.hist(pinshu)
+    # data = pd.read_csv('res/results.csv', delimiter=',')
+    #
+    # print('shape = ', data.shape)
+    # dt_avg = np.array(data['average'])
+    # # print(dt_avg.max())
+    # distribute = np.linspace(0.2, 3.2, 15+1)
+    # fenzu = pd.cut(data['average'].values, distribute)
+    # print('分组: \n', fenzu)
+    # # pinshu = fenzu.value_counts()
+    # # print(pinshu)
+    # # plt.hist(pinshu)
+    # # plt.show()
+    # plt.hist(data['average'], bins=15, facecolor='blue', alpha=0.75,rwidth=0.8)
+    # plt.savefig('res/hist.jpg')
     # plt.show()
-    plt.hist(data['average'], bins=15, facecolor='blue', alpha=0.75,rwidth=0.8)
-    plt.savefig('res/hist.jpg')
-    plt.show()
 
     # fenzu = pd.cut(dt_avg, distribute)
     # print('分组: \n', fenzu)
