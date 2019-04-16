@@ -36,7 +36,7 @@ def getColorList(id):  # flag=1表示模板颜色匹配
     else:
         # 粉色
         # H:340-360 S:30%-54% V:70%-100%
-        lower_pink = np.array([165, 76, 191])
+        lower_pink = np.array([168, 90, 170])
         upper_pink = np.array([180, 153, 255])
         color_list = []
     color_list.append(lower_pink)
@@ -104,7 +104,7 @@ def getColorList(id):  # flag=1表示模板颜色匹配
         upper_purple = np.array([159, 255, 255])
     else:
         # H:270-350 S:30%-54%,V:25%-86%
-        lower_purple = np.array([135, 65, 64])
+        lower_purple = np.array([160, 65, 155])  # 对于阴影要把v改小
         upper_purple = np.array([175, 138, 220])
 
         # lower_purple = np.array([135, 76, 64])
@@ -114,5 +114,4 @@ def getColorList(id):  # flag=1表示模板颜色匹配
     color_list.append(lower_purple)
     color_list.append(upper_purple)
     dict['purple'] = color_list
-
     return dict

@@ -19,7 +19,8 @@ def main():
     # assistant.delete_image('images/catching/')
     assistant.save_collected_images('images/catching/')
     start = time.time()
-    e_image_path = 'images/mould/65.jpg';
+    # 7,33,61
+    e_image_path = 'images/mould/61.jpg';
     e_image = cv2.imread(e_image_path)
     decesion = Decision(e_image)  # 传入电子图
     #

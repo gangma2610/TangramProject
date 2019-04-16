@@ -49,18 +49,20 @@ def draw_line_chart():
     print(x)
     # print(y)
 
-    plt.plot(x, dt_avg, 'r-', linewidth=1, label='Average in one trail')
-    plt.plot(x, np.array([avg] * len(dt_avg)), 'r--', linewidth=1, label='Average in all trails')
-    plt.plot(x, np.array([all_std]*data.shape[0]), 'm--', linewidth=1, label='Standard deviation in all trails')
+    plt.plot(x, dt_avg, 'r-', linewidth=1, label='Average of relative errors in one trail')
+    plt.plot(x, np.array([avg] * len(dt_avg)), 'r--', linewidth=1, label='Average of relative errors in all trails')
+    plt.plot(x, np.array([all_std]*data.shape[0]), 'm--', linewidth=1, label='Standard deviation of relative errors in all trails')
     # plt.plot(x, dt_var, 'b-', linewidth=2, label='Var')
+    plt.text(100, avg - 0.05, round(avg, 3))
+    plt.text(100, all_std - 0.05, round(all_std, 3))
 
     plt.ylim(0, 5)
     plt.xlim(1, data.shape[0])
     plt.xlabel('Trails')
-    plt.ylabel('Distances (mm)')
+    plt.ylabel('Relative errors between two blocks (mm)')
     plt.legend(loc='upper right')
     # plt.title('Results')
-    plt.grid()
+    # plt.grid()
     plt.savefig('res/statistics.jpg')
     plt.show()
 
@@ -90,13 +92,33 @@ def draw_distribution():
 
 def draw_hist():
     data = pd.read_csv('res/results.csv', delimiter=',')
-    plt.hist(data['average'], bins=15, facecolor='blue', alpha=0.75, rwidth=0.8)
+    # plt.hist(data['average'], bins=15, normed=1, facecolor='blue', alpha=0.75, rwidth=0.8)
+    plt.hist(data['average'], bins=15, normed=1, facecolor='blue', alpha=0.75, rwidth=0.8, cumulative=True)
+    plt.xlabel('Relative errors between two blocks (mm)')
+    plt.ylabel('Cumulative frequency')
+    plt.grid()
     plt.savefig('res/hist.jpg')
+
+    plt.show()
+
+def draw_hist_2():
+    data = pd.read_csv('res/results.csv', delimiter=',')
+    plt.hist(data['average'], bins=15, facecolor='blue', alpha=0.75, rwidth=0.8)
+    # plt.hist(data['average'], bins=15, normed=1, facecolor='blue', alpha=0.6, rwidth=0.8, cumulative=True)
+
+    # plt.grid()
+    plt.xlabel('Relative errors between two blocks (mm)')
+    plt.ylabel('Trail times')
+
+    plt.savefig('res/hist2.jpg')
+
     plt.show()
 
 if __name__ == '__main__':
-    draw_hist()
-    # draw_line_chart()
+    # draw_hist()
+    # draw_hist_2()
+
+    draw_line_chart()
     # draw_scatter_chart()
     # draw_distribution()
 

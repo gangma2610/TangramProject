@@ -39,7 +39,7 @@ def main():
     robot_instance = RobotController()
 
     # 笛卡尔坐标运动
-    control = 1
+    control = 4
 
 
     if control ==0 :

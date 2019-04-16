@@ -20,8 +20,8 @@ def clear_stack():
 
 def get_list(e_image):
     info = []
-    for i in range( 0, 7):
-    # for i in [3, 4]:
+    for i in range(0, 7):
+    # for i in [1,2,5,6]:
     # for i in [3]:
         if i == 0:
             color = 'pink'

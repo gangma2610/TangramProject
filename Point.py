@@ -118,7 +118,7 @@ class Point:
         else:
             vertexnum0 = self.numberVertexParallelogram(vertex, box)
 
-        if vertexnum0 != 0 and vertexnum0!=-1:
+        if vertexnum0 != 0 and vertexnum0 != -1:
             self.Reverse(vertex, vertexnum0, 3)
             self.Reverse(vertex, 0, vertexnum0 - 1)
             self.Reverse(vertex, 0, 3)
@@ -126,7 +126,7 @@ class Point:
 
 
 
-        return vertex,vertexnum0
+        return vertex, vertexnum0
 
     def getSlope(self, p1, p2, flag, threshold=10):
         """计算斜率
@@ -149,16 +149,16 @@ class Point:
 
     def parallelogramJudge(self, vertex):
         """平行四边形判别：两组对边分别平行的四边形是平行四边形"""
-        k01 = self.getSlope(vertex[0], vertex[1], 0, 15)
-        k23 = self.getSlope(vertex[2], vertex[3], 0, 15)
-        k12 = self.getSlope(vertex[1], vertex[2], 0, 15)
-        k03 = self.getSlope(vertex[0], vertex[3], 0, 15)
-        # print(str(k01)+" "+str(k23)+" "+str(k12)+" "+str(k03))
-        if abs(k01 - k23) <= 10 and abs(k12 - k03) <= 10:
+        k01 = self.getSlope(vertex[0], vertex[1], 0, 5)
+        k23 = self.getSlope(vertex[2], vertex[3], 0, 5)
+        k12 = self.getSlope(vertex[1], vertex[2], 0, 5)
+        k03 = self.getSlope(vertex[0], vertex[3], 0, 5)
+        print(str(k01)+" "+str(k23)+" "+str(k12)+" "+str(k03))
+        if abs(k01 - k23) <= 10 or abs(k12 - k03) <= 10:
             return True
-        elif (k01 == float("inf") and k23 == float("inf")) and abs(k12 - k03) <= 10:
+        elif (k01 == float("inf") and k23 == float("inf")) or abs(k12 - k03) <= 10:
             return True
-        elif (k12 == float("inf") and k03 == float("inf")) and abs(k01 - k23) <= 10:
+        elif (k12 == float("inf") and k03 == float("inf")) or abs(k01 - k23) <= 10:
             return True
         else:
             return False

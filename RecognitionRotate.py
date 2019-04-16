@@ -5,7 +5,7 @@ import imutils
 
 from Point import *
 import ColorList
-
+import config as cfg
 class ColorContourRecognition:
     """该类完成以下基本操作：
         2. 亮度对比度调整
@@ -90,29 +90,109 @@ class ColorContourRecognition:
 
         # cv2.imshow(d, thresh)
         # cv2.waitKey(0)
-        return self.image, thresh
+
+        return self.image, thresh, hsv
+
+    def getColorPart2(self, colorIndict, img):
+        """获取目标颜色部分的二值图"""
+        hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+        colordic = ColorList.getColorList(self.id)
+        for d in colordic:
+            if d == colorIndict:
+                if len(colordic[d]) == 4:
+                    mask1 = cv2.inRange(hsv, colordic[d][0], colordic[d][1])
+                    mask2 = cv2.inRange(hsv, colordic[d][2], colordic[d][3])
+                    thresh = cv2.addWeighted(mask1, 1, mask2, 1, 0)
+                else:
+                    thresh = cv2.inRange(hsv, colordic[d][0], colordic[d][1])
+                break
+        thresh = self.postprocessMorphology(thresh)
+
+        # cv2.imshow(d, thresh)
+        # cv2.waitKey(0)
+
+        return img, thresh, hsv
+
+    def getAvgHsv(self, hsv, cX, cY):
+        w = 50
+        minx = cX - w
+        miny = cY - w
+        avg_tmp = 0
+        for i in range(0, 100):
+            for j in range(0, 100):
+                avg_tmp = avg_tmp + hsv[miny + i, minx + j][0]
+        # print(avg_tmp)
+        avg_tmp = avg_tmp / 10000
+        avg_h = avg_tmp
+        return avg_h
+
+    def avg_cal(self, img, thresh, hsv):
+        h, w, ch = img.shape
+        area = (thresh / 255).sum()
+        all_pixel = w * h
+        img_no_background = []
+        img_no_background_h = thresh / 255 * hsv[:, :, 0]
+        img_no_background_s = thresh / 255 * hsv[:, :, 1]
+        img_no_background_v = thresh / 255 * hsv[:, :, 2]
+        avg_h = np.round(np.mean(img_no_background_h) * all_pixel / area, 2)
+        avg_s = np.round(np.mean(img_no_background_s) * all_pixel / area, 2)
+        avg_v = np.round(np.mean(img_no_background_v) * all_pixel / area, 2)
+
+        # img_no_background.append([avg_h, avg_s, avg_v])
+        return [avg_h, avg_s, avg_v]
+
+    def judgethresh(self, color, avg, pre_cnt_num, c):
+        color_min = color + '_min'
+        color_max = color + '_max'
+        if cfg.color_threshold[color_min][0] < avg[0] < cfg.color_threshold[color_max][0] and  \
+            cfg.color_threshold[color_min][1] < avg[1] < cfg.color_threshold[color_max][1] and \
+            cfg.color_threshold[color_min][2] < avg[2] < cfg.color_threshold[color_max][2]:
+                self.cnts.append(c)
+                cv2.drawContours(self.image, [c], -1, (0, 255, 0), 1)
+                return True
+        else:
+            return False
+
+    def areathresh(self, area, color):  # 面积过滤
+        if cfg.area_thresh[color] < area:
+            return True
+        else:
+            return False
 
     def getContours(self, color):
         """寻找轮廓并粗略过滤"""
-        self.image, thresh = self.getColorPart(color)
-        # cv2.imshow("thresh",thresh)
-        # cv2.waitKey(0)
+        self.image, thresh, hsv = self.getColorPart(color)
         cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL,
                                 cv2.CHAIN_APPROX_SIMPLE)
         # cnt 表示轮廓上的所有点
         cnts = cnts[0] if imutils.is_cv2() else cnts[1]
+        pre_cnt_num =0
+        avg_all = []
         for c in cnts:
             area = cv2.contourArea(c)
             M = cv2.moments(c)
             cX = int(M["m10"] / M["m00"])
             cY = int(M["m01"] / M["m00"])
-            # print("area",area)
-            if area > 1000:  # 对区域进行初步筛选，过滤掉一些很小的
-                self.cnts.append(c)
-                cv2.drawContours(self.image, [c], -1, (0, 255, 0), 1)
-                # cv2.circle(self.image, (cX, cY), 1, (255, 0, 0), 1)
+            if self.areathresh(area, color):   # 对区域进行初步筛选，过滤掉一些很小的
+                if self.id == 0:
+                    x, y, w, h = cv2.boundingRect(c)  # offsets - with this you get 'mask'
+                    part = self.image[y:y + h, x:x + w]
+                    part_img, part_thresh, part_hsv = self.getColorPart2(color, part)
+                    # cv2.imshow("thresh", part_thresh)
+                    # cv2.waitKey(0)®
+                    avg = self.avg_cal(part_img, part_thresh, part_hsv)
+                    print(avg)
+                    f = self.judgethresh(color, avg, pre_cnt_num, c)
+                # if f:
+                #     print("color:{0},area:{1}".format(color, area))
+                else:
+                    self.cnts.append(c)
+                    cv2.drawContours(self.image, [c], -1, (0, 255, 0), 1)
+            else:
+                pass
         self.cnt_num = len(self.cnts)
-        # print("getContour...")
+        # for c in self.cnts:
+        #     cv2.drawContours(self.image, [c], -1, (255, 255, 0), 1)
         # cv2.imshow("getContours01", self.image)
         # cv2.waitKey(0)
         return self.image
@@ -120,6 +200,7 @@ class ColorContourRecognition:
     def getAccurateContours(self, color):
         """获取第一阶段处理结果（上述操作的总和）"""
         self.getContours(color)
+
         return self.image
 
 
@@ -134,13 +215,6 @@ class ShapeRecognition(ColorContourRecognition):
         6. 第三阶段，对颜色、形状相同的轮廓根据尺寸来进行最后一步筛选
         7. 三个阶段完整的识别过程
         """
-
-    # def __init__(self, id, cap, path):
-    #     self.shape = ''
-    #     self.vertex = []
-    #     self.hypotenusAngle = 0
-    #     self.centerVector = (0, 0)
-    #     ColorContourRecognition.__init__(self, id, cap, path)
 
     def __init__(self, id, img):
         self.shape = ''
@@ -161,7 +235,7 @@ class ShapeRecognition(ColorContourRecognition):
 
     def getApprox(self, cnt):  # 轮廓逼近
 
-        epsilon = 0.05 * cv2.arcLength(cnt, True)
+        epsilon = 0.08 * cv2.arcLength(cnt, True)
         approx = cv2.approxPolyDP(cnt, epsilon, True)  # 得到逼近的顶点
 
         return approx
@@ -180,6 +254,12 @@ class ShapeRecognition(ColorContourRecognition):
                            (tempVertexs[cornerIndex].x, tempVertexs[cornerIndex].y), 2,
                            (255, 0, 0), 2)
         else:
+            for cornerIndex in range(0, corners):
+                singleTempVertex = Point(approx[cornerIndex][0][0], approx[cornerIndex][0][1])
+                tempVertexs.append(singleTempVertex)
+                cv2.circle(self.image,
+                           (tempVertexs[cornerIndex].x, tempVertexs[cornerIndex].y), 2,
+                           (255, 0, 0), 2)
             pass  # tempVertexs为空
         return tempVertexs, approx
 
@@ -215,7 +295,7 @@ class ShapeRecognition(ColorContourRecognition):
                 else:  # 根据两组对边平行的四边形是平行四边形
                     tempVertexs,isError = p.numberVertexuadrangle(1, tempVertexs, box)
                     # print("isError",isError)
-                    if isError ==-1:
+                    if isError == -1:
                         self.shape = 'none'
                         return tempVertexs,self.shape
                     # print("temp",tempVertexs)
@@ -304,6 +384,26 @@ class ShapeRecognition(ColorContourRecognition):
                         else:
                             print("this is cntindex",cntIndex)
                             index_temp.append(cntIndex)
+                elif colorGoal == 'pink':
+                    image_temp = self.image
+                    real_temp = ShapeRecognition(0, image_temp)
+                    real_temp.getContours('purple')
+                    # print("this is real_temp", real_temp.cnts)
+                    cnts_temp = []
+                    vertex_temp = []
+                    M_temp = cv2.moments(real_temp.cnts[0])
+                    cX_temp = int(M_temp["m10"] / M_temp["m00"])
+                    cY_temp = int(M_temp["m01"] / M_temp["m00"])
+                    for cntIndex in range(0, self.cnt_num):
+                        M = cv2.moments(self.cnts[cntIndex])
+                        cX = int(M["m10"] / M["m00"])
+                        cY = int(M["m01"] / M["m00"])
+                        if abs(cX - cX_temp) <= 10 and abs(cY - cY_temp) <= 10:
+                            print("pass...")
+                            pass
+                        else:
+                            print("this is cntindex", cntIndex)
+                            index_temp.append(cntIndex)
                 if len(index_temp) > 1:
                     print("self.cnt_num>1")
                     for cntIndex in index_temp:
@@ -311,8 +411,10 @@ class ShapeRecognition(ColorContourRecognition):
                         if area >= goalArea:
                             goalArea = area
                             goalIndex = cntIndex
-                else:
+                elif len(index_temp) == 1:
                     goalIndex = index_temp[0]
+                else:
+                    pass
 
             elif colorGoal == 'red':
                 for cntIndex in range(0, self.cnt_num):
@@ -366,7 +468,7 @@ class ShapeRecognition(ColorContourRecognition):
         """ 完整的识别过程"""
         self.getAccurateContours(colorGoal)  # 第一次简单过滤掉很小的区域
         self.preliminarynalysis(shapeGoal)   # 第二次根据形状过滤
-        self.ultimateFilter(colorGoal, shapeGoal)       # 第三次根据面积过滤
+        self.ultimateFilter(colorGoal, shapeGoal)  # 第三次根据面积过滤
 
 
 class Rotate:
@@ -451,32 +553,8 @@ class Rotate:
         return pRotated
 
 
-
-def testCamera():
-    cto = 0
-    if cto == 0:
-        """ 摄像头测试 """
-        cap = cv2.VideoCapture(0)
-        cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1024)
-        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 768)
-        print('启动摄像头...')
-        # return cap
-        ret, real_image = cap.read()
-    elif cto == 1:
-    # cv2.imshow("test", real_image)
-    # cv2.waitKey(0)
-    # cv2.imwrite("images/results/3.jpg", real_image)
-    # real_image = cv2.imread('/Users/lynn/Desktop/test2.jpg')
-    # real_image = cv2.imread('/Users/xiaoxiao/Desktop/图像采集/20190121210537/75.jpg')
-    #     real_image = cv2.imread('images/catching/157.jpg')
-        real_image = cv2.imread('res/res_imgs/63.jpg')
-    # for i in range(28, 29):
-    #     path = 'images/catching/'+str(i)+'.jpg'
-    #     # # path = '/Users/xiaoxiao/Desktop/七巧板/图像采集/20190121201529/'+str(i)+'.jpg'
-    #     # print(path)
-    #     real_image = cv2.imread(path)
-
-    for i in [4]:
+def select(real_image):
+    for i in range(0, 1):
         if i == 0:
             colorGoal = 'pink'
             shapeGoal = 'triangle'
@@ -498,77 +576,40 @@ def testCamera():
         elif i == 6:
             colorGoal = 'purple'
             shapeGoal = 'triangle'
-        print(colorGoal)
+        # print(colorGoal)
         # mould = ShapeRecognition(1, mould_image)
         # mould.completeRecognition(colorGoal, shapeGoal)
         real = ShapeRecognition(0, real_image)
         real.completeRecognition(colorGoal, shapeGoal)
         # print('mould vector:', mould.centerVector)
-        print('real vector:', real.centerVector)
+        # print('real vector:', real.centerVector)
         # rotate = Rotate()
         # angle = rotate.getRotateAngle(real, mould, shapeGoal)
         # print(colorGoal + " angle", angle)
     # cv2.imwrite("images/results/1.jpg", real.getImage())
     # return image
+def testCamera():
+    cto = 1
+    if cto == 0:
+        """ 摄像头测试 """
+        cap = cv2.VideoCapture(0)
+        cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1024)
+        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 768)
+        print('启动摄像头...')
+        # return cap
+        ret, real_image = cap.read()
+    elif cto == 1:
+        for i in range(59,60):
+            print(i)
+            path = "images/catching/" + str(i)+".jpg"
+        #     # # path = '/Users/xiaoxiao/Desktop/七巧板/图像采集/20190121201529/'+str(i)+'.jpg'
+        #     # print(path)
+            real_image = cv2.imread(path)
+            select(real_image)
 
-def recognitionRotate():  # 完整测试
 
-    # capPath = "images/figured/01.jpg"
-    # mould_image = testCamera()
-    for image_index in range(0, 229):
-        mouldPath = 'images/mould/1.jpg'
-        mould_image = cv2.imread(mouldPath)
-        print("image_index",image_index)
-        # cap = testCamera()
-        # ret, real_image = cap.read()
-        capPath = "images/figured2/"
-        # cappath = "images/simpleImage/blue/"
-        # mouldpath = "images/mould/"
-        capPath += str(image_index) + ".jpg"
-        real_image = cv2.imread(capPath)
 
-        # cap = cv2.VideoCapture(0)
-        # cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1024)
-        # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 768)
-        # print('启动摄像头...')
-        # for i in range(6, 7):
-        for i in [0, 1, 2, 3, 4, 5, 6]:
-            if i == 0:
-                colorGoal = 'pink'
-                shapeGoal = 'triangle'
-            elif i == 1:
-                colorGoal = 'red'
-                shapeGoal = 'triangle'
-            elif i == 2:
-                colorGoal = 'orange'
-                shapeGoal = 'triangle'
-            elif i == 3:
-                colorGoal = 'yellow'
-                shapeGoal = 'parallelogram'
-            elif i == 4:
-                colorGoal = 'green'
-                shapeGoal = 'triangle'
-            elif i == 5:
-                colorGoal = 'blue'
-                shapeGoal = 'square'
-            elif i == 6:
-                colorGoal = 'purple'
-                shapeGoal = 'triangle'
-            print(colorGoal)
-            mould = ShapeRecognition(1, mould_image)
-            mould.completeRecognition(colorGoal, shapeGoal)
-            real = ShapeRecognition(0, real_image)
-            real.completeRecognition(colorGoal, shapeGoal)
-            print('mould vector:' , mould.centerVector)
-            print('real vector:' , real.centerVector)
-            rotate = Rotate()
-            angle = rotate.getRotateAngle(real, mould, shapeGoal)
-            print(colorGoal+" angle", angle)
-            cv2.imwrite("images/results/" + str(image_index) + str(colorGoal)+'.jpg', real.getImage())
 
 
 if __name__ == '__main__':
-
-    # classTest()
-    # recognitionRotate()
     testCamera()
